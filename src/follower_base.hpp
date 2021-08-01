@@ -8,13 +8,13 @@ using namespace bogaudio::dsp;
 namespace bogaudio {
 
 struct FollowerBase : BGModule {
-	typedef EQParamQuantity EFGainParamQuantity;
+    typedef EQParamQuantity EFGainParamQuantity;
 
-	static constexpr float efGainMinDecibels = Equalizer::cutDb;
-	static constexpr float efGainMaxDecibels = Equalizer::gainDb;
+    static constexpr float efGainMinDecibels = Equalizer::cutDb;
+    static constexpr float efGainMaxDecibels = Equalizer::gainDb;
 
-	float sensitivity(Param& dampParam, Input* dampInput, int c);
-	float gain(Param& gainParam, Input* gainInput, int c);
+    float sensitivity(Param &dampParam, Input *dampInput, int c);
+    float gain(Param &gainParam, Input *gainInput, int c);
 };
 
 } // namespace bogaudio

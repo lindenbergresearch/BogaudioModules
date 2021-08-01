@@ -5,35 +5,37 @@
 
 using namespace bogaudio::dsp;
 
-extern Model* modelBlank3;
+extern Model *modelBlank3;
 
 namespace bogaudio {
 
 struct Blank3 : BGModule {
-	enum ParamsIds {
-		NUM_PARAMS
-	};
+    enum ParamsIds {
+        NUM_PARAMS
+    };
 
-	enum InputsIds {
-		IN_INPUT,
-		NUM_INPUTS
-	};
+    enum InputsIds {
+        IN_INPUT,
+        NUM_INPUTS
+    };
 
-	enum OutputsIds {
-		NUM_OUTPUTS
-	};
+    enum OutputsIds {
+        NUM_OUTPUTS
+    };
 
-	RootMeanSquare _rms;
-	bool _haveLevel = false;
-	float _level = 0.0f;
+    RootMeanSquare _rms;
+    bool _haveLevel = false;
+    float _level = 0.0f;
 
-	Blank3() {
-		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS);
-		sampleRateChange();
-	}
 
-	void sampleRateChange() override;
-	void processAll(const ProcessArgs& args) override;
+    Blank3() {
+        config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS);
+        sampleRateChange();
+    }
+
+
+    void sampleRateChange() override;
+    void processAll(const ProcessArgs &args) override;
 };
 
 } // namespace bogaudio

@@ -2,36 +2,38 @@
 
 #include "bogaudio.hpp"
 
-extern Model* modelMult;
+extern Model *modelMult;
 
 namespace bogaudio {
 
 struct Mult : BGModule {
-	enum ParamsIds {
-		NUM_PARAMS
-	};
+    enum ParamsIds {
+        NUM_PARAMS
+    };
 
-	enum InputsIds {
-		INA_INPUT,
-		INB_INPUT,
-		NUM_INPUTS
-	};
+    enum InputsIds {
+        INA_INPUT,
+        INB_INPUT,
+        NUM_INPUTS
+    };
 
-	enum OutputsIds {
-		OUTA1_OUTPUT,
-		OUTA2_OUTPUT,
-		OUTA3_OUTPUT,
-		OUTB1_OUTPUT,
-		OUTB2_OUTPUT,
-		OUTB3_OUTPUT,
-		NUM_OUTPUTS
-	};
+    enum OutputsIds {
+        OUTA1_OUTPUT,
+        OUTA2_OUTPUT,
+        OUTA3_OUTPUT,
+        OUTB1_OUTPUT,
+        OUTB2_OUTPUT,
+        OUTB3_OUTPUT,
+        NUM_OUTPUTS
+    };
 
-	Mult() {
-		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS);
-	}
 
-	void processAll(const ProcessArgs& args) override;
+    Mult() {
+        config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS);
+    }
+
+
+    void processAll(const ProcessArgs &args) override;
 };
 
 } // namespace bogaudio

@@ -2,7 +2,7 @@
 
 #include "bogaudio.hpp"
 
-extern Model* modelTest;
+extern Model *modelTest;
 
 //#define LPF 1
 // #define LPFNOISE 1
@@ -36,6 +36,7 @@ extern Model* modelTest;
 #define STEPPED_RANDOM 1
 
 #include "pitch.hpp"
+
 #ifdef LPF
 #include "dsp/filters/filter.hpp"
 #elif LPFNOISE
@@ -110,8 +111,10 @@ extern Model* modelTest;
 #include "dsp/pitch.hpp"
 #include "lfo_base.hpp"
 #elif STEPPED_RANDOM
+
 #include "dsp/oscillator.hpp"
 #include "dsp/noise.hpp"
+
 #else
 #error what
 #endif
@@ -121,253 +124,255 @@ using namespace bogaudio::dsp;
 namespace bogaudio {
 
 struct Test : BGModule {
-	enum ParamsIds {
-		PARAM1_PARAM,
-		PARAM2_PARAM,
-		PARAM3_PARAM,
-		NUM_PARAMS
-	};
+    enum ParamsIds {
+        PARAM1_PARAM,
+        PARAM2_PARAM,
+        PARAM3_PARAM,
+        NUM_PARAMS
+    };
 
-	enum InputsIds {
-		CV1_INPUT,
-		CV2_INPUT,
-		CV3_INPUT,
-		IN_INPUT,
-		NUM_INPUTS
-	};
+    enum InputsIds {
+        CV1_INPUT,
+        CV2_INPUT,
+        CV3_INPUT,
+        IN_INPUT,
+        NUM_INPUTS
+    };
 
-	enum OutputsIds {
-		OUT_OUTPUT,
-		OUT2_OUTPUT,
-		NUM_OUTPUTS
-	};
+    enum OutputsIds {
+        OUT_OUTPUT,
+        OUT2_OUTPUT,
+        NUM_OUTPUTS
+    };
 
 #ifdef LPF
-	LowPassFilter _lpf;
+    LowPassFilter _lpf;
 #elif LPFNOISE
-	WhiteNoiseGenerator _noise;
-	LowPassFilter _lpf;
+    WhiteNoiseGenerator _noise;
+    LowPassFilter _lpf;
 #elif SINE
-	SineOscillator _sine;
-	SineTable _table;
-	TablePhasor _sine2;
+    SineOscillator _sine;
+    SineTable _table;
+    TablePhasor _sine2;
 #elif SQUARE
-	SquareOscillator _square;
-	BandLimitedSquareOscillator _square2;
+    SquareOscillator _square;
+    BandLimitedSquareOscillator _square2;
 #elif SAW
-	SawOscillator _saw;
-	BandLimitedSawOscillator _saw2;
+    SawOscillator _saw;
+    BandLimitedSawOscillator _saw2;
 #elif SATSAW
-	SaturatingSawOscillator _saw;
-	BandLimitedSawOscillator _saw2;
+    SaturatingSawOscillator _saw;
+    BandLimitedSawOscillator _saw2;
 #elif TRIANGLE
-	TriangleOscillator _triangle;
+    TriangleOscillator _triangle;
 #elif SAMPLED_TRIANGLE
-	TriangleOscillator _triangle;
-	TriangleOscillator _triangle2;
-	int _sampleSteps = 1 << 20;
-	int _sampleStep = 0;
-	float _sample = 0.0f;
+    TriangleOscillator _triangle;
+    TriangleOscillator _triangle2;
+    int _sampleSteps = 1 << 20;
+    int _sampleStep = 0;
+    float _sample = 0.0f;
 #elif SINEBANK
-	SineBankOscillator _sineBank;
+    SineBankOscillator _sineBank;
 #elif OVERSAMPLING
-	SawOscillator _saw1;
-	SawOscillator _saw2;
-	LowPassFilter _lpf;
-	LowPassFilter _lpf2;
-	rack::Decimator<OVERSAMPLEN, OVERSAMPLEN> _rackDecimator;
+    SawOscillator _saw1;
+    SawOscillator _saw2;
+    LowPassFilter _lpf;
+    LowPassFilter _lpf2;
+    rack::Decimator<OVERSAMPLEN, OVERSAMPLEN> _rackDecimator;
 #elif OVERSAMPLED_BL
-	BandLimitedSawOscillator _saw1;
-	BandLimitedSawOscillator _saw2;
-	LowPassFilter _lpf;
+    BandLimitedSawOscillator _saw1;
+    BandLimitedSawOscillator _saw2;
+    LowPassFilter _lpf;
 #elif ANTIALIASING
-	#define OVERSAMPLEN 8
-	Phasor _phasor;
-	Phasor _oversampledPhasor;
-	BandLimitedSawOscillator _saw;
-	BandLimitedSquareOscillator _square;
-	bogaudio::dsp::LPFDecimator _sawDecimator;
-	bogaudio::dsp::LPFDecimator _squareDecimator;
-	rack::Decimator<OVERSAMPLEN, OVERSAMPLEN> _sawRackDecimator;
-	rack::Decimator<OVERSAMPLEN, OVERSAMPLEN> _squareRackDecimator;
+#define OVERSAMPLEN 8
+    Phasor _phasor;
+    Phasor _oversampledPhasor;
+    BandLimitedSawOscillator _saw;
+    BandLimitedSquareOscillator _square;
+    bogaudio::dsp::LPFDecimator _sawDecimator;
+    bogaudio::dsp::LPFDecimator _squareDecimator;
+    rack::Decimator<OVERSAMPLEN, OVERSAMPLEN> _sawRackDecimator;
+    rack::Decimator<OVERSAMPLEN, OVERSAMPLEN> _squareRackDecimator;
 #elif DECIMATORS
-	#define OVERSAMPLEN 8
-	#define STAGES 4
-	BandLimitedSawOscillator _saw;
-	bogaudio::dsp::CICDecimator _cicDecimator;
-	bogaudio::dsp::LPFDecimator _lpfDecimator;
-	rack::Decimator<OVERSAMPLEN, OVERSAMPLEN> _rackDecimator;
+#define OVERSAMPLEN 8
+#define STAGES 4
+    BandLimitedSawOscillator _saw;
+    bogaudio::dsp::CICDecimator _cicDecimator;
+    bogaudio::dsp::LPFDecimator _lpfDecimator;
+    rack::Decimator<OVERSAMPLEN, OVERSAMPLEN> _rackDecimator;
 #elif INTERPOLATOR
-	#define FACTOR 8
-	#define STAGES 4
-	BandLimitedSawOscillator _saw;
-	bogaudio::dsp::CICDecimator _decimator;
-	bogaudio::dsp::CICInterpolator _interpolator;
-	int _steps;
-	float _rawSamples[FACTOR] {};
-	float _processedSamples[FACTOR] {};
+#define FACTOR 8
+#define STAGES 4
+    BandLimitedSawOscillator _saw;
+    bogaudio::dsp::CICDecimator _decimator;
+    bogaudio::dsp::CICInterpolator _interpolator;
+    int _steps;
+    float _rawSamples[FACTOR] {};
+    float _processedSamples[FACTOR] {};
 #elif FM
-	float _baseHz = 0.0f;
-	float _ratio = 0.0f;
-	float _index = 0.0f;
-	float _sampleRate = 0.0f;
-	SineTableOscillator _modulator;
-	SineTableOscillator _carrier;
-	SineTableOscillator _modulator2;
-	SineTableOscillator _carrier2;
+    float _baseHz = 0.0f;
+    float _ratio = 0.0f;
+    float _index = 0.0f;
+    float _sampleRate = 0.0f;
+    SineTableOscillator _modulator;
+    SineTableOscillator _carrier;
+    SineTableOscillator _modulator2;
+    SineTableOscillator _carrier2;
 #elif PM
-	SineTableOscillator _modulator;
-	SineTableOscillator _carrier;
+    SineTableOscillator _modulator;
+    SineTableOscillator _carrier;
 #elif FEEDBACK_PM
-	SineTableOscillator _carrier;
-	float _feedbackSample = 0.0f;
+    SineTableOscillator _carrier;
+    float _feedbackSample = 0.0f;
 #elif EG
-	ADSR _envelope;
+    ADSR _envelope;
 #elif TABLES
-	SineTableOscillator _sine;
-	TablePhasor _table;
+    SineTableOscillator _sine;
+    TablePhasor _table;
 #elif SLEW
-	bogaudio::dsp::SlewLimiter _slew;
-	ShapedSlewLimiter _slew2;
+    bogaudio::dsp::SlewLimiter _slew;
+    ShapedSlewLimiter _slew2;
 #elif RMS
-	RootMeanSquare _rms;
-	PucketteEnvelopeFollower _pef;
+    RootMeanSquare _rms;
+    PucketteEnvelopeFollower _pef;
 #elif FASTRMS
-	PureRootMeanSquare _pure;
-	FastRootMeanSquare _fast;
+    PureRootMeanSquare _pure;
+    FastRootMeanSquare _fast;
 #elif RAVG
-	RunningAverage _average;
-	Trigger _reset;
+    RunningAverage _average;
+    Trigger _reset;
 #elif SATURATOR
-	Saturator _saturator;
+    Saturator _saturator;
 #elif BROWNIAN
-	WhiteNoiseGenerator _noise1;
-	GaussianNoiseGenerator _noise2;
-	LowPassFilter _filter1;
-	LowPassFilter _filter2;
-	float _last1 = 0.0f;
-	float _last2 = 0.0f;
+    WhiteNoiseGenerator _noise1;
+    GaussianNoiseGenerator _noise2;
+    LowPassFilter _filter1;
+    LowPassFilter _filter2;
+    float _last1 = 0.0f;
+    float _last2 = 0.0f;
 #elif INTEGRATOR
-	WhiteNoiseGenerator _noise;
-	Integrator _integrator;
+    WhiteNoiseGenerator _noise;
+    Integrator _integrator;
 #elif RANDOMWALK
-	RandomWalk _walk1;
-	RandomWalk _walk2;
+    RandomWalk _walk1;
+    RandomWalk _walk2;
 #elif DCBLOCKER
-	DCBlocker _filter;
+    DCBlocker _filter;
 #elif LFO_SMOOTHER
-	LFOBase::Smoother _smoother;
+    LFOBase::Smoother _smoother;
 #elif STEPPED_RANDOM
-	PositiveZeroCrossing _trigger;
-	SteppedRandomOscillator _stepped;
-	SteppedRandomOscillator::phase_t _lastPhase = 0;
-	WhiteNoiseGenerator _noise;
-	float _lastNoise = 0.0f;
+    PositiveZeroCrossing _trigger;
+    SteppedRandomOscillator _stepped;
+    SteppedRandomOscillator::phase_t _lastPhase = 0;
+    WhiteNoiseGenerator _noise;
+    float _lastNoise = 0.0f;
 #endif
 
-	Test()
+
+    Test()
 #if SINE
-	: _table(12)
-	, _sine2(_table)
+    : _table(12)
+    , _sine2(_table)
 #elif DECIMATORS
-	: _cicDecimator(STAGES)
+    : _cicDecimator(STAGES)
 #elif INTERPOLATOR
-	: _decimator(STAGES)
-	, _interpolator(STAGES)
+    : _decimator(STAGES)
+    , _interpolator(STAGES)
 #elif TABLES
-	: _table(StaticBlepTable::table(), 44100.0, 1000.0)
+    : _table(StaticBlepTable::table(), 44100.0, 1000.0)
 #elif RAVG
-	: _average(APP->engine->getSampleRate(), 1.0f, 1000.0f)
+    : _average(APP->engine->getSampleRate(), 1.0f, 1000.0f)
 #endif
-	{
-		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS);
-		configParam(PARAM1_PARAM, 0.0f, 1.0f, 0.5f, "param1");
-		configParam(PARAM2_PARAM, 0.0f, 1.0f, 0.5f, "param2");
-		configParam(PARAM3_PARAM, 0.0f, 1.0f, 0.5f, "param3");
+    {
+        config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS);
+        configParam(PARAM1_PARAM, 0.0f, 1.0f, 0.5f, "param1");
+        configParam(PARAM2_PARAM, 0.0f, 1.0f, 0.5f, "param2");
+        configParam(PARAM3_PARAM, 0.0f, 1.0f, 0.5f, "param3");
 
 #ifdef SINE
-		_table.generate();
-		_sine2.setPhase(M_PI);
+        _table.generate();
+        _sine2.setPhase(M_PI);
 
 #elif SAW
-		_saw2.setPhase(M_PI);
+        _saw2.setPhase(M_PI);
 
 #elif SATSAW
-		_saw2.setPhase(M_PI);
+        _saw2.setPhase(M_PI);
 
 #elif SAMPLED_TRIANGLE
-		_triangle2.setPhase(M_PI);
+        _triangle2.setPhase(M_PI);
 
 #elif SINEBANK
-		const float baseAmplitude = 5.0;
-		switch (5) {
-			case 1: {
-				// saw
-				for (int i = 1, n = _sineBank.partialCount(); i <= n; ++i) {
-					_sineBank.setPartial(i, i, baseAmplitude / (float)i);
-				}
-				_sineBank.syncToPhase(M_PI);
-				break;
-			}
+        const float baseAmplitude = 5.0;
+        switch (5) {
+            case 1: {
+                // saw
+                for (int i = 1, n = _sineBank.partialCount(); i <= n; ++i) {
+                    _sineBank.setPartial(i, i, baseAmplitude / (float)i);
+                }
+                _sineBank.syncToPhase(M_PI);
+                break;
+            }
 
-			case 2: {
-				// square
-				for (int i = 1, n = _sineBank.partialCount(); i <= n; ++i) {
-					_sineBank.setPartial(i, i, i % 2 == 1 ? baseAmplitude / (float)i : 0.0);
-				}
-				break;
-			}
+            case 2: {
+                // square
+                for (int i = 1, n = _sineBank.partialCount(); i <= n; ++i) {
+                    _sineBank.setPartial(i, i, i % 2 == 1 ? baseAmplitude / (float)i : 0.0);
+                }
+                break;
+            }
 
-			case 3: {
-				// triangle
-				if (false) {
-					for (int i = 1, n = _sineBank.partialCount(); i <= n; ++i) {
-						_sineBank.setPartial(i, i, i % 2 == 1 ? baseAmplitude / (float)(i * i) : 0.0);
-					}
-					_sineBank.syncToPhase(M_PI / 2.0);
-				}
-				else {
-					_sineBank.setPartial(1, 1.0f, baseAmplitude);
-					for (int i = 2, n = _sineBank.partialCount(); i < n; ++i) {
-						float k = 2*i - 1;
-						_sineBank.setPartial(i, k, powf(-1.0f, k) * baseAmplitude/(k * k));
-					}
-				}
-				break;
-			}
+            case 3: {
+                // triangle
+                if (false) {
+                    for (int i = 1, n = _sineBank.partialCount(); i <= n; ++i) {
+                        _sineBank.setPartial(i, i, i % 2 == 1 ? baseAmplitude / (float)(i * i) : 0.0);
+                    }
+                    _sineBank.syncToPhase(M_PI / 2.0);
+                }
+                else {
+                    _sineBank.setPartial(1, 1.0f, baseAmplitude);
+                    for (int i = 2, n = _sineBank.partialCount(); i < n; ++i) {
+                        float k = 2*i - 1;
+                        _sineBank.setPartial(i, k, powf(-1.0f, k) * baseAmplitude/(k * k));
+                    }
+                }
+                break;
+            }
 
-			case 4: {
-				// saw-square
-				for (int i = 1, n = _sineBank.partialCount(); i <= n; ++i) {
-					_sineBank.setPartial(i, i, i % 2 == 1 ? baseAmplitude / (float)i : baseAmplitude / (float)(2 * i));
-				}
-				break;
-			}
+            case 4: {
+                // saw-square
+                for (int i = 1, n = _sineBank.partialCount(); i <= n; ++i) {
+                    _sineBank.setPartial(i, i, i % 2 == 1 ? baseAmplitude / (float)i : baseAmplitude / (float)(2 * i));
+                }
+                break;
+            }
 
-			case 5: {
-				// ?
-				float factor = 0.717;
-				float factor2 = factor;
-				float multiple = 1.0;
-				for (int i = 1, n = _sineBank.partialCount(); i <= n; ++i) {
-					_sineBank.setPartial(i, multiple, baseAmplitude / multiple);
-					multiple += i % 2 == 1 ? factor : factor2;
-				}
-				break;
-			}
-		}
+            case 5: {
+                // ?
+                float factor = 0.717;
+                float factor2 = factor;
+                float multiple = 1.0;
+                for (int i = 1, n = _sineBank.partialCount(); i <= n; ++i) {
+                    _sineBank.setPartial(i, multiple, baseAmplitude / multiple);
+                    multiple += i % 2 == 1 ? factor : factor2;
+                }
+                break;
+            }
+        }
 
 #elif OVERSAMPLED_BL
-		_saw2.setPhase(M_PI);
+        _saw2.setPhase(M_PI);
 #endif
-	}
+    }
 
-	void reset() override;
-	void processAll(const ProcessArgs& args) override;
-	float oscillatorPitch(float max = 10000.0);
-	float oscillatorPitch2(float max = 10000.0);
-	float ratio2();
-	float index3();
+
+    void reset() override;
+    void processAll(const ProcessArgs &args) override;
+    float oscillatorPitch(float max = 10000.0);
+    float oscillatorPitch2(float max = 10000.0);
+    float ratio2();
+    float index3();
 };
 
 } // namespace bogaudio

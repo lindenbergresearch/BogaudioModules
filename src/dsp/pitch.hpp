@@ -8,28 +8,34 @@ const float referenceSemitone = 60.0; // C4; value of C4 in semitones is arbitra
 const float twelfthRootTwo = 1.0594630943592953;
 const float logTwelfthRootTwo = logf(1.0594630943592953);
 
+
 inline float frequencyToSemitone(float frequency) {
-	return logf(frequency / referenceFrequency) / logTwelfthRootTwo + referenceSemitone;
+    return logf(frequency / referenceFrequency) / logTwelfthRootTwo + referenceSemitone;
 }
+
 
 inline float semitoneToFrequency(float semitone) {
-	return powf(twelfthRootTwo, semitone - referenceSemitone) * referenceFrequency;
+    return powf(twelfthRootTwo, semitone - referenceSemitone) * referenceFrequency;
 }
+
 
 inline float frequencyToCV(float frequency) {
-	return log2f(frequency / referenceFrequency);
+    return log2f(frequency / referenceFrequency);
 }
+
 
 inline float cvToFrequency(float cv) {
-	return powf(2.0, cv) * referenceFrequency;
+    return powf(2.0, cv) * referenceFrequency;
 }
+
 
 inline float cvToSemitone(float cv) {
-	return frequencyToSemitone(cvToFrequency(cv));
+    return frequencyToSemitone(cvToFrequency(cv));
 }
 
+
 inline float semitoneToCV(float semitone) {
-	return frequencyToCV(semitoneToFrequency(semitone));
+    return frequencyToCV(semitoneToFrequency(semitone));
 }
 
 } // namespace dsp

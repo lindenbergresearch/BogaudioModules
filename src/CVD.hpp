@@ -5,53 +5,60 @@
 
 using namespace bogaudio::dsp;
 
-extern Model* modelCVD;
+extern Model *modelCVD;
 
 namespace bogaudio {
 
 struct CVD : BGModule {
-	enum ParamsIds {
-		TIME_PARAM,
-		TIME_SCALE_PARAM,
-		MIX_PARAM,
-		NUM_PARAMS
-	};
+    enum ParamsIds {
+        TIME_PARAM,
+        TIME_SCALE_PARAM,
+        MIX_PARAM,
+        NUM_PARAMS
+    };
 
-	enum InputsIds {
-		TIME_INPUT,
-		MIX_INPUT,
-		IN_INPUT,
-		NUM_INPUTS
-	};
+    enum InputsIds {
+        TIME_INPUT,
+        MIX_INPUT,
+        IN_INPUT,
+        NUM_INPUTS
+    };
 
-	enum OutputsIds {
-		OUT_OUTPUT,
-		NUM_OUTPUTS
-	};
+    enum OutputsIds {
+        OUT_OUTPUT,
+        NUM_OUTPUTS
+    };
 
-	struct Engine {
-		DelayLine delay;
-		CrossFader mix;
 
-		Engine() : delay(1000.0f, 10000.0f) {}
+    struct Engine {
+        DelayLine delay;
+        CrossFader mix;
 
-		void sampleRateChange();
-	};
-	Engine* _engines[maxChannels] {};
 
-	CVD() {
-		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS);
-		configParam(TIME_PARAM, 0.0f, 1.0f, 0.5f, "Time base", " s");
-		configParam(TIME_SCALE_PARAM, 0.0f, 2.0f, 1.0f, "Time scale", "", 10.0f, 0.1f);
-		configParam(MIX_PARAM, -1.0f, 1.0f, 0.0f, "Dry wet mix", "%", 0.0f, 100.0f);
-	}
+        Engine() : delay(1000.0f, 10000.0f) {}
 
-	void sampleRateChange() override;
-	int channels() override;
-	void addChannel(int c) override;
-	void removeChannel(int c) override;
-	void modulateChannel(int c) override;
-	void processChannel(const ProcessArgs& args, int c) override;
+
+        void sampleRateChange();
+    };
+
+
+    Engine *_engines[maxChannels]{};
+
+
+    CVD() {
+        config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS);
+        configParam(TIME_PARAM, 0.0f, 1.0f, 0.5f, "Time base", " s");
+        configParam(TIME_SCALE_PARAM, 0.0f, 2.0f, 1.0f, "Time scale", "", 10.0f, 0.1f);
+        configParam(MIX_PARAM, -1.0f, 1.0f, 0.0f, "Dry wet mix", "%", 0.0f, 100.0f);
+    }
+
+
+    void sampleRateChange() override;
+    int channels() override;
+    void addChannel(int c) override;
+    void removeChannel(int c) override;
+    void modulateChannel(int c) override;
+    void processChannel(const ProcessArgs &args, int c) override;
 };
 
 } // namespace bogaudio

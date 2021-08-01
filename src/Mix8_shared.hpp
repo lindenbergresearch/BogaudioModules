@@ -4,8 +4,8 @@
 #include "mixer_expander.hpp"
 #include "dsp/signal.hpp"
 
-extern Model* modelMix8;
-extern Model* modelMix8x;
+extern Model *modelMix8;
+extern Model *modelMix8x;
 
 namespace bogaudio {
 

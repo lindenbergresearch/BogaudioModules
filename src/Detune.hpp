@@ -5,49 +5,51 @@
 
 using namespace bogaudio::dsp;
 
-extern Model* modelDetune;
+extern Model *modelDetune;
 
 namespace bogaudio {
 
 struct Detune : BGModule {
-	enum ParamsIds {
-		CENTS_PARAM,
-		NUM_PARAMS
-	};
+    enum ParamsIds {
+        CENTS_PARAM,
+        NUM_PARAMS
+    };
 
-	enum InputsIds {
-		CV_INPUT,
-		IN_INPUT,
-		NUM_INPUTS
-	};
+    enum InputsIds {
+        CV_INPUT,
+        IN_INPUT,
+        NUM_INPUTS
+    };
 
-	enum OutputsIds {
-		THRU_OUTPUT,
-		OUT_PLUS_OUTPUT,
-		OUT_MINUS_OUTPUT,
-		NUM_OUTPUTS
-	};
+    enum OutputsIds {
+        THRU_OUTPUT,
+        OUT_PLUS_OUTPUT,
+        OUT_MINUS_OUTPUT,
+        NUM_OUTPUTS
+    };
 
-	float _cents[maxChannels] {};
-	float _lastCents[maxChannels];
-	float _lastInCV[maxChannels];
-	float _plusCV[maxChannels] {};
-	float _minusCV[maxChannels] {};
+    float _cents[maxChannels]{};
+    float _lastCents[maxChannels];
+    float _lastInCV[maxChannels];
+    float _plusCV[maxChannels]{};
+    float _minusCV[maxChannels]{};
 
-	Detune() {
-		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS);
-		configParam(CENTS_PARAM, 0.0f, 50.0f, 0.0f, "Cents");
 
-		for (int i = 0; i < maxChannels; ++i) {
-			_lastCents[i] = -1.0f;
-			_lastInCV[i] = -1000.0f;
-		}
-	}
+    Detune() {
+        config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS);
+        configParam(CENTS_PARAM, 0.0f, 50.0f, 0.0f, "Cents");
 
-	bool active() override;
-	int channels() override;
-	void modulateChannel(int c) override;
-	void processChannel(const ProcessArgs& args, int c) override;
+        for (int i = 0; i < maxChannels; ++i) {
+            _lastCents[i] = -1.0f;
+            _lastInCV[i] = -1000.0f;
+        }
+    }
+
+
+    bool active() override;
+    int channels() override;
+    void modulateChannel(int c) override;
+    void processChannel(const ProcessArgs &args, int c) override;
 };
 
 } // namespace bogaudio
