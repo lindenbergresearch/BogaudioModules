@@ -388,6 +388,10 @@ void AnalyzerDisplay::onButton(const event::Button &e) {
     if (!(e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0)) {
         return;
     }
+
+    // ignore clicks at left inset
+    if (e.pos.x < _insetLeft) return;
+
     e.consume(this);
     _freezeMouse = e.pos;
     _freezeLastBinI = -1;
