@@ -556,10 +556,12 @@ void AnalyzerDisplay::drawBackground(const DrawArgs &args) {
     nvgRect(args.vg, 0, 0, _size.x, _size.y);
     nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0x00, 0xff));
     nvgFill(args.vg);
-    if (_drawInset) {
-        nvgStrokeColor(args.vg, nvgRGBA(0x50, 0x50, 0x50, 0xff));
-        nvgStroke(args.vg);
-    }
+
+    // if (_drawInset) {
+    nvgStrokeColor(args.vg, nvgRGBA(0xFF, 0xFF, 0xFF, 0x80));
+    nvgStroke(args.vg);
+    //  }
+
     nvgRestore(args.vg);
 }
 
@@ -567,9 +569,9 @@ void AnalyzerDisplay::drawBackground(const DrawArgs &args) {
 void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float rangeMaxHz) {
     nvgSave(args.vg);
 
-    const int textY = -4;
-    const int charPx = 5;
-    int x = _insetAround + 2;
+    const int textY = -8;
+    const int charPx = 7;
+    int x = _insetAround + 12;
 
     std::string s = format("Peaks (+/-%0.1f):", (_module->_core._sampleRate / 2.0f) / (float) (_module->_core._size / _module->_core._binAverageN));
     drawText(args, s.c_str(), x, _insetTop + textY);
@@ -580,6 +582,7 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
         x += 5;
         spacing = 20;
     }
+
     for (int i = 0; i < _module->_core._nChannels; ++i) {
         if (_module->_core._channels[i]) {
             s = format("%c:%7.1f", 'A' + i, _module->_core.getPeak(i, rangeMinHz, rangeMaxHz));
@@ -610,6 +613,7 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
         case DECIBELS_80_AP:
         case DECIBELS_140_AP: {
             float rangeDb = plot == DECIBELS_140_AP ? 140.0 : 80.0;
+
             auto line = [&](float db, float sw, const char *label, float labelOffset) {
                 nvgBeginPath(args.vg);
                 int y = _insetTop + (_graphSize.y - _graphSize.y * (rangeDb - _positiveDisplayDB + db) / rangeDb);
@@ -617,17 +621,20 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
                 nvgLineTo(args.vg, _size.x - _insetRight, y);
                 nvgStrokeWidth(args.vg, strokeWidth * sw);
                 nvgStroke(args.vg);
-                drawText(args, label, _insetLeft - textX, y + labelOffset, textR);
+                drawText(args, label, textX, y + labelOffset, 0);
             };
-            line(12.0, 1.0, "12", 5.0);
-            line(0.0, 2.0, "0", 2.3);
+
+            line(+12.0, 1.0, "+12", 05.0);
+            line(+00.0, 2.0, "+-0", 02.3);
             line(-12.0, 1.0, "-12", 10.0);
             line(-24.0, 1.0, "-24", 10.0);
             line(-48.0, 1.0, "-48", 10.0);
+
             if (rangeDb > 100.0) {
                 line(-96.0, 1.0, "-96", 10.0);
             }
-            drawText(args, "dB", _insetLeft - textX, _size.y - _insetBottom, textR);
+
+            drawText(args, "dB", textX, _size.y - _insetBottom, 0);
             break;
         }
 
@@ -646,10 +653,10 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
             line(140.0, 1.0, "140", 8.0);
             line(120.0, 1.0, "120", 8.0);
             line(100.0, 2.0, "100", 8.0);
-            line(80.0, 1.0, "80", 5.0);
-            line(60.0, 1.0, "60", 5.0);
-            line(40.0, 1.0, "40", 5.0);
-            line(20.0, 1.0, "20", 5.0);
+            line(080.0, 1.0, " 80", 5.0);
+            line(060.0, 1.0, " 60", 5.0);
+            line(040.0, 1.0, " 40", 5.0);
+            line(020.0, 1.0, " 20", 5.0);
             drawText(args, "%", textX, _size.y - _insetBottom, textR);
             break;
         }
@@ -896,7 +903,7 @@ void AnalyzerDisplay::drawFreezeUnder(const DrawArgs &args, float lowHz, float h
     nvgScissor(args.vg, _insetLeft, _insetTop, _graphSize.x, _graphSize.y);
     nvgBeginPath(args.vg);
     nvgRect(args.vg, _insetLeft + x1, _insetTop, x2 - x1, _size.y - _insetBottom);
-    nvgFillColor(args.vg, nvgRGBA(0x00, 0xff, 0x00, 0xa0));
+    nvgFillColor(args.vg, nvgRGBA(0x00, 0xff, 0xff, 0x70));
     nvgFill(args.vg);
     nvgRestore(args.vg);
 }
@@ -904,6 +911,7 @@ void AnalyzerDisplay::drawFreezeUnder(const DrawArgs &args, float lowHz, float h
 
 void AnalyzerDisplay::drawFreezeOver(const DrawArgs &args, int binI, int binsN, float lowHz, float highHz, float strokeWidth) {
     nvgSave(args.vg);
+
     auto formatHz = [](float hz) -> std::string {
         if (hz < 1000.0f) {
             return format("%0.2f Hz", hz);
@@ -914,6 +922,7 @@ void AnalyzerDisplay::drawFreezeOver(const DrawArgs &args, int binI, int binsN, 
     std::vector<std::string> labels;
     std::vector<std::string> values;
     std::vector<const NVGcolor *> colors;
+
     labels.push_back("Bin");
     values.push_back(format("%d / %d", binI + 1, binsN));
     colors.push_back(NULL);
@@ -923,6 +932,7 @@ void AnalyzerDisplay::drawFreezeOver(const DrawArgs &args, int binI, int binsN, 
     labels.push_back("High");
     values.push_back(formatHz(highHz));
     colors.push_back(NULL);
+
     for (int i = 0; i < _module->_core._nChannels; ++i) {
         if (_displayChannel[i] && (_module->_core._channels[i] || _channelBinsReaderFactories[i])) {
             if (_channelLabels[i].empty()) {
@@ -968,28 +978,33 @@ void AnalyzerDisplay::drawFreezeOver(const DrawArgs &args, int binI, int binsN, 
         maxLine * charWidth + 2 * inset,
         lines.size() * charHeight + (lines.size() - 1) * lineSep + 2 * inset
     );
+
     Vec boxPos(
         _freezeMouse.x + mousePad,
         _freezeMouse.y - boxDim.y / 2.0f
     );
+
     if (boxPos.x + boxDim.x > _size.x - _insetRight) {
         boxPos.x = _freezeMouse.x - mousePad - boxDim.x;
     }
+
     if (_freezeMouse.y - boxDim.y / 2.0f < _insetTop + edgePad) {
         boxPos.y = _insetTop + edgePad;
     }
+
     if (_freezeMouse.y + boxDim.y / 2.0f > _size.y - _insetBottom - edgePad) {
         boxPos.y = _size.y - _insetBottom - edgePad - boxDim.y;
     }
 
     nvgBeginPath(args.vg);
     nvgRect(args.vg, boxPos.x, boxPos.y, boxDim.x, boxDim.y);
-    nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0x00, 0xff));
+    nvgFillColor(args.vg, nvgRGBA(0x40, 0x40, 0x40, 0xff));
     nvgFill(args.vg);
 
     nvgStrokeColor(args.vg, _axisColor); // nvgRGBA(0x00, 0xff, 0x00, 0xd0));
     nvgStrokeWidth(args.vg, strokeWidth);
     nvgBeginPath(args.vg);
+
     nvgMoveTo(args.vg, boxPos.x, boxPos.y);
     nvgLineTo(args.vg, boxPos.x + boxDim.x, boxPos.y);
     nvgLineTo(args.vg, boxPos.x + boxDim.x, boxPos.y + boxDim.y);
