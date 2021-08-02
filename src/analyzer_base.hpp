@@ -207,7 +207,7 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
     typedef std::function<std::unique_ptr<BinsReader>(AnalyzerCore &)> BinsReaderFactory;
 
     const int _insetAround = 2;
-    const int _insetLeft = _insetAround + 12;
+    const int _insetLeft = _insetAround + 150;
     const int _insetRight = _insetAround + 2;
     const int _insetTop = _insetAround + 13;
     const int _insetBottom = _insetAround + 9;
@@ -218,8 +218,9 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
 
     const float baseXAxisLogFactor = 1 / 3.321; // magic number.
 
-    const NVGcolor _axisColor = nvgRGBA(0xff, 0xff, 0xff, 0x70);
-    const NVGcolor _textColor = nvgRGBA(0xff, 0xff, 0xff, 0xc0);
+    const NVGcolor _axisColor = nvgRGBAf(0.2f, 0.2f, 0.2f, 1.f);
+    const NVGcolor _textColor = nvgRGBAf(1, 1, 1, 1);
+
     static constexpr int channelColorsN = 8;
     const NVGcolor _channelColors[channelColorsN] = {
         nvgRGBA(0x00, 0xff, 0x00, 0xd0),
@@ -255,7 +256,7 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
         bool drawInset
     )
         : _module(module), _size(size), _graphSize(_size.x - _insetLeft - _insetRight, _size.y - _insetTop - _insetBottom), _drawInset(drawInset),
-          _font(APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/inconsolata.ttf"))) {
+        _font(APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/Hack-Bold.ttf"))) {
         if (_module) {
             _channelBinsReaderFactories = new BinsReaderFactory[_module->_core._nChannels]{};
             _displayChannel = new bool[_module->_core._nChannels]{};
@@ -291,7 +292,7 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
     void freezeValues(float rangeMinHz, float rangeMaxHz, int &binI, float &lowHz, float &highHz);
     void drawFreezeUnder(const DrawArgs &args, float lowHz, float highHz, float rangeMinHz, float rangeMaxHz, float strokeWidth);
     void drawFreezeOver(const DrawArgs &args, int binI, int binsN, float lowHz, float highHz, float strokeWidth);
-    void drawText(const DrawArgs &args, const char *s, float x, float y, float rotation = 0.0, const NVGcolor *color = NULL, int fontSize = 10);
+    void drawText(const DrawArgs &args, const char *s, float x, float y, float rotation = 0.0, const NVGcolor *color = NULL, int fontSize = 12);
     int binValueToHeight(float value, AmplitudePlot plot);
     static float binValueToAmplitude(float value);
     static float binValueToDb(float value);
