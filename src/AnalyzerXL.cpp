@@ -131,12 +131,12 @@ void AnalyzerXL::processAll(const ProcessArgs &args) {
 
 
 struct AnalyzerXLWidget : AnalyzerBaseWidget {
-    static constexpr int hp = 42;
+    static constexpr int HP = 62;
 
 
     AnalyzerXLWidget(AnalyzerXL *module) {
         setModule(module);
-        box.size = Vec(RACK_GRID_WIDTH * hp, RACK_GRID_HEIGHT);
+        box.size = Vec(RACK_GRID_WIDTH * HP, RACK_GRID_HEIGHT);
         setPanel(box.size, "AnalyzerXL", false);
 
         {
@@ -179,7 +179,7 @@ struct AnalyzerXLWidget : AnalyzerBaseWidget {
         addFrequencyRangeContextMenu(menu);
         addAmplitudePlotContextMenu(menu);
         {
-            OptionsMenuItem *mi = new OptionsMenuItem("Smoothing");
+            auto *mi = new OptionsMenuItem("Smoothing");
             mi->addItem(OptionMenuItem("None", [a]() { return a->_smooth == 0.0f; }, [a]() { a->_smooth = 0.0f; }));
             mi->addItem(OptionMenuItem("10ms", [a]() { return a->_smooth == 0.01f; }, [a]() { a->_smooth = 0.01f; }));
             mi->addItem(OptionMenuItem("50ms", [a]() { return a->_smooth == 0.05f; }, [a]() { a->_smooth = 0.05f; }));
@@ -189,7 +189,7 @@ struct AnalyzerXLWidget : AnalyzerBaseWidget {
             OptionsMenuItem::addToMenu(mi, menu);
         }
         {
-            OptionsMenuItem *mi = new OptionsMenuItem("Quality");
+            auto *mi = new OptionsMenuItem("Quality");
             mi->addItem(OptionMenuItem("Good", [a]() { return a->_quality == AnalyzerCore::QUALITY_GOOD; }, [a]() { a->_quality = AnalyzerCore::QUALITY_GOOD; }));
             mi->addItem(OptionMenuItem("High", [a]() { return a->_quality == AnalyzerCore::QUALITY_HIGH; }, [a]() { a->_quality = AnalyzerCore::QUALITY_HIGH; }));
             mi->addItem(OptionMenuItem("Ultra", [a]() { return a->_quality == AnalyzerCore::QUALITY_ULTRA; }, [a]() { a->_quality = AnalyzerCore::QUALITY_ULTRA; }));
@@ -197,7 +197,7 @@ struct AnalyzerXLWidget : AnalyzerBaseWidget {
             OptionsMenuItem::addToMenu(mi, menu);
         }
         {
-            OptionsMenuItem *mi = new OptionsMenuItem("Window");
+            auto *mi = new OptionsMenuItem("Window");
             mi->addItem(OptionMenuItem("Kaiser", [a]() { return a->_window == AnalyzerCore::WINDOW_KAISER; }, [a]() { a->_window = AnalyzerCore::WINDOW_KAISER; }));
             mi->addItem(OptionMenuItem("Hamming", [a]() { return a->_window == AnalyzerCore::WINDOW_HAMMING; }, [a]() { a->_window = AnalyzerCore::WINDOW_HAMMING; }));
             mi->addItem(OptionMenuItem("None", [a]() { return a->_window == AnalyzerCore::WINDOW_NONE; }, [a]() { a->_window = AnalyzerCore::WINDOW_NONE; }));
@@ -207,4 +207,4 @@ struct AnalyzerXLWidget : AnalyzerBaseWidget {
 };
 
 
-Model *modelAnalyzerXL = bogaudio::createModel<AnalyzerXL, AnalyzerXLWidget>("Bogaudio-AnalyzerXL", "ANALYZER-XL", "8-channel spectrum analyzer", "Visual");
+auto *modelAnalyzerXL = bogaudio::createModel<AnalyzerXL, AnalyzerXLWidget>("Bogaudio-AnalyzerXL", "ANALYZER-XL", "8-channel spectrum analyzer", "Visual");
