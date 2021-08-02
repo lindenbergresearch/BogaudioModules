@@ -613,7 +613,7 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
                 nvgLineTo(args.vg, _size.x - _insetRight, y);
                 nvgStrokeWidth(args.vg, strokeWidth * sw);
                 nvgStroke(args.vg);
-                drawText(args, label, textX, y + labelOffset, textR);
+                drawText(args, label, _insetLeft - textX, y + labelOffset, textR);
             };
             line(12.0, 1.0, "12", 5.0);
             line(0.0, 2.0, "0", 2.3);
@@ -623,7 +623,7 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
             if (rangeDb > 100.0) {
                 line(-96.0, 1.0, "-96", 10.0);
             }
-            drawText(args, "dB", textX, _size.y - _insetBottom, textR);
+            drawText(args, "dB", _insetLeft - textX, _size.y - _insetBottom, textR);
             break;
         }
 
