@@ -614,21 +614,22 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
         case DECIBELS_140_AP: {
             float rangeDb = plot == DECIBELS_140_AP ? 140.0 : 80.0;
 
-            auto line = [&](float db, float sw, const char *label, float labelOffset) {
+            auto line = [&](float db, float sw, const char *label, float labelOffset, const NVGcolor &color) {
                 nvgBeginPath(args.vg);
                 int y = _insetTop + (_graphSize.y - _graphSize.y * (rangeDb - _positiveDisplayDB + db) / rangeDb);
                 nvgMoveTo(args.vg, lineX, y);
                 nvgLineTo(args.vg, _size.x - _insetRight, y);
+                nvgStrokeColor(args.vg, color);
                 nvgStrokeWidth(args.vg, strokeWidth * sw);
                 nvgStroke(args.vg);
                 drawText(args, label, textX, y + labelOffset, 0);
             };
 
-            line(+12.0, 1.0, "+12", 05.0);
-            line(+00.0, 2.0, "+-0", 02.3);
-            line(-12.0, 1.0, "-12", 10.0);
-            line(-24.0, 1.0, "-24", 10.0);
-            line(-48.0, 1.0, "-48", 10.0);
+            line(+12.0, 1.0, "+12", 05.0, _axisColor);
+            line(+00.0, 2.0, "+-0", 02.3, nvgRGBAf(1.f, 1.f, 1.f, 0.9f));
+            line(-12.0, 1.0, "-12", 10.0, _axisColor);
+            line(-24.0, 1.0, "-24", 10.0, _axisColor);
+            line(-48.0, 1.0, "-48", 10.0, _axisColor);
 
             if (rangeDb > 100.0) {
                 line(-96.0, 1.0, "-96", 10.0);
