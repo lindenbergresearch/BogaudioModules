@@ -494,7 +494,9 @@ void AnalyzerDisplay::draw(const DrawArgs &args) {
 
     drawBackground(args);
 
-    float strokeWidth = std::max(1.0f, 3.0f - getZoom());
+    // set stroke-width depending on zoom
+    float strokeWidth = 1.f / getZoom() * 1.4f;
+
     if (frequencyPlot == LINEAR_FP) {
         _xAxisLogFactor = 1.0f;
     } else {
