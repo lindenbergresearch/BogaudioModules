@@ -514,8 +514,11 @@ void AnalyzerDisplay::draw(const DrawArgs &args) {
     if (_module) {
         drawHeader(args, rangeMinHz, rangeMaxHz);
     }
-    drawYAxis(args, strokeWidth, amplitudePlot);
+
     drawXAxis(args, strokeWidth, frequencyPlot, rangeMinHz, rangeMaxHz);
+    drawYAxis(args, strokeWidth, amplitudePlot);
+
+
     if (_module) {
         int freezeBinI = 0;
         float freezeLowHz = 0.0f;
@@ -557,10 +560,10 @@ void AnalyzerDisplay::drawBackground(const DrawArgs &args) {
     nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0x00, 0xff));
     nvgFill(args.vg);
 
-    // if (_drawInset) {
-    nvgStrokeColor(args.vg, nvgRGBA(0xFF, 0xFF, 0xFF, 0x80));
-    nvgStroke(args.vg);
-    //  }
+    if (_drawInset) {
+        nvgStrokeColor(args.vg, nvgRGBA(0xFF, 0x0, 0xFF, 0x80));
+        nvgStroke(args.vg);
+    }
 
     nvgRestore(args.vg);
 }
@@ -573,8 +576,8 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
     const int charPx = 7;
     int x = _insetAround + 12;
 
-    std::string s = format("Peaks (+/-%0.1f):", (_module->_core._sampleRate / 2.0f) / (float) (_module->_core._size / _module->_core._binAverageN));
-    drawText(args, s.c_str(), x, _insetTop + textY);
+    std::string s = format("Peaks +/-%0.1f", (_module->_core._sampleRate / 2.0f) / (float) (_module->_core._size / _module->_core._binAverageN));
+    drawText(args, s.c_str(), x + _insetLeft, _insetTop + textY);
     x += s.size() * charPx - 0;
 
     int spacing = 3;
@@ -597,17 +600,14 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
 
 void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, AmplitudePlot plot) {
     nvgSave(args.vg);
-    nvgStrokeColor(args.vg, _axisColor);
-    nvgStrokeWidth(args.vg, strokeWidth);
-    const int lineX = _insetLeft - 2;
-    const int textX = 9;
-    const float textR = -M_PI / 2.0;
+    nvgStrokeColor(args.vg, nvgRGBAf(0.9f, 0.9f, 0.9f, 1.f));
+    nvgStrokeWidth(args.vg, strokeWidth * 1.2f);
 
-    nvgBeginPath(args.vg);
-    int lineY = _insetTop;
-    nvgMoveTo(args.vg, lineX, lineY);
-    nvgLineTo(args.vg, _size.x - _insetRight, lineY);
-    nvgStroke(args.vg);
+    const int lineX = _insetLeft - 2;
+    const int textX = 0;
+    const float textR = -M_PI / 2.0;
+    auto labelColor = nvgRGBAf(0.6f, 0.6f, 0.0f, 1.f);
+
 
     switch (plot) {
         case DECIBELS_80_AP:
@@ -625,52 +625,56 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
                 drawText(args, label, textX, y + labelOffset, 0);
             };
 
-            line(+12.0, 1.0, "+12", 05.0, _axisColor);
-            line(+00.0, 2.0, "+-0", 02.3, nvgRGBAf(1.f, 1.f, 1.f, 0.9f));
-            line(-12.0, 1.0, "-12", 10.0, _axisColor);
-            line(-24.0, 1.0, "-24", 10.0, _axisColor);
-            line(-48.0, 1.0, "-48", 10.0, _axisColor);
+            line(+12.0, 1.0, " 12", 02.0, _axisColor);
+            line(+00.0, 1.5, "  0", 02.0, nvgRGBAf(0.3f, 0.4f, 0.0f, 1.f));
+            line(-12.0, 1.0, "-12", 02.0, _axisColor);
+            line(-24.0, 1.0, "-24", 02.0, _axisColor);
+            line(-48.0, 1.0, "-48", 02.0, _axisColor);
 
             if (rangeDb > 100.0) {
-                line(-96.0, 1.0, "-96", 10.0);
+                line(-96.0, 1.0, "-96", 2.0, _axisColor);
             }
 
-            drawText(args, "dB", textX, _size.y - _insetBottom, 0);
+            drawText(args, " dB", textX, _size.y - _insetBottom, 0, &labelColor);
             break;
         }
 
         case PERCENTAGE_AP: {
-            auto line = [&](float pct, float sw, const char *label, float labelOffset) {
+            auto line = [&](float pct, float sw, const char *label, float labelOffset, const NVGcolor &color) {
                 nvgBeginPath(args.vg);
                 int y = _insetTop + (_graphSize.y - _graphSize.y * (pct / (100.0 * _totalLinearAmplitude)));
                 nvgMoveTo(args.vg, lineX, y);
                 nvgLineTo(args.vg, _size.x - _insetRight, y);
+                nvgStrokeColor(args.vg, color);
                 nvgStrokeWidth(args.vg, strokeWidth * sw);
                 nvgStroke(args.vg);
-                drawText(args, label, textX, y + labelOffset, textR);
+                drawText(args, label, textX, y + labelOffset, 0);
             };
-            line(180.0, 1.0, "180", 8.0);
-            line(160.0, 1.0, "160", 8.0);
-            line(140.0, 1.0, "140", 8.0);
-            line(120.0, 1.0, "120", 8.0);
-            line(100.0, 2.0, "100", 8.0);
-            line(080.0, 1.0, " 80", 5.0);
-            line(060.0, 1.0, " 60", 5.0);
-            line(040.0, 1.0, " 40", 5.0);
-            line(020.0, 1.0, " 20", 5.0);
-            drawText(args, "%", textX, _size.y - _insetBottom, textR);
+
+            line(180.0, 1.0, "180", 2.0, _axisColor);
+            line(160.0, 1.0, "160", 2.0, _axisColor);
+            line(140.0, 1.0, "140", 2.0, _axisColor);
+            line(120.0, 1.0, "120", 2.0, _axisColor);
+            line(100.0, 1.5, "100", 2.0, nvgRGBAf(0.3f, 0.4f, 0.0f, 1.f));
+            line(080.0, 1.0, " 80", 2.0, _axisColor);
+            line(060.0, 1.0, " 60", 2.0, _axisColor);
+            line(040.0, 1.0, " 40", 2.0, _axisColor);
+            line(020.0, 1.0, " 20", 2.0, _axisColor);
+
+
+            drawText(args, "  %", textX, _size.y - _insetBottom, 0, &labelColor);
             break;
         }
     }
 
     nvgBeginPath(args.vg);
-    lineY = _insetTop + _graphSize.y + 1;
+    int lineY = _insetTop;
+    nvgStrokeColor(args.vg, nvgRGBAf(0.7f, 0.7f, 0.7f, 1.f));
+    nvgStrokeWidth(args.vg, strokeWidth * 1.2);
     nvgMoveTo(args.vg, lineX, lineY);
     nvgLineTo(args.vg, _size.x - _insetRight, lineY);
-    nvgStroke(args.vg);
-
-    nvgBeginPath(args.vg);
-    nvgMoveTo(args.vg, lineX, _insetTop);
+    nvgLineTo(args.vg, _size.x - _insetRight, _size.y - _insetBottom);
+    nvgLineTo(args.vg, lineX, _size.y - _insetBottom);
     nvgLineTo(args.vg, lineX, lineY);
     nvgStroke(args.vg);
 
@@ -682,6 +686,7 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
     nvgSave(args.vg);
     nvgStrokeColor(args.vg, _axisColor);
     nvgStrokeWidth(args.vg, strokeWidth);
+    auto labelColor = nvgRGBAf(0.6f, 0.6f, 0.0f, 1.f);
 
     switch (plot) {
         case LOG_FP: {
@@ -714,13 +719,13 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                 hz += 100000.0;
             }
 
-            drawText(args, " Hz", _insetLeft, _size.y - 2);
+            drawText(args, "Hz", _insetLeft, _size.y - 6, 0, &labelColor);
             if (rangeMinHz <= 100.0f) {
                 float x = (100.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
                 x = powf(x, _xAxisLogFactor);
                 if (x < 1.0) {
                     x *= _graphSize.x;
-                    drawText(args, "100", _insetLeft + x - 8, _size.y - 2);
+                    drawText(args, "100", _insetLeft + x - 8, _size.y - 6);
                 }
             }
             if (rangeMinHz <= 1000.0f) {
@@ -728,7 +733,7 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                 x = powf(x, _xAxisLogFactor);
                 if (x < 1.0) {
                     x *= _graphSize.x;
-                    drawText(args, "1k", _insetLeft + x - 4, _size.y - 2);
+                    drawText(args, "1k", _insetLeft + x - 4, _size.y - 6);
                 }
             }
             if (rangeMinHz <= 10000.0f) {
@@ -736,7 +741,7 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                 x = powf(x, _xAxisLogFactor);
                 if (x < 1.0) {
                     x *= _graphSize.x;
-                    drawText(args, "10k", _insetLeft + x - 7, _size.y - 2);
+                    drawText(args, "10k", _insetLeft + x - 7, _size.y - 6);
                 }
             }
             if (rangeMinHz <= 100000.0f) {
@@ -744,7 +749,7 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                 x = powf(x, _xAxisLogFactor);
                 if (x < 1.0) {
                     x *= _graphSize.x;
-                    drawText(args, "100k", _insetLeft + x - 9, _size.y - 2);
+                    drawText(args, "100k", _insetLeft + x - 9, _size.y - 6);
                 }
             }
 
@@ -759,7 +764,7 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                             lastX = x;
                             x *= _graphSize.x;
                             std::string s = format("%dk", (int) (hz / 1000.0f));
-                            drawText(args, s.c_str(), _insetLeft + x - 7, _size.y - 2);
+                            drawText(args, s.c_str(), _insetLeft + x - 7, _size.y - 6);
                         }
                         hz += increment;
                     }
@@ -792,7 +797,7 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                 divisor = 1000.0f;
             }
 
-            drawText(args, "Hz", _insetLeft, _size.y - 2);
+            drawText(args, "Hz", _insetLeft, _size.y - 6, 0, &labelColor);
             float hz = 0.0f;
             float lastX = 0.0f;
             float xMin = 0.1f;
@@ -814,7 +819,7 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                         } else {
                             s = format("%0.1f%s", dhz, suffix);
                         }
-                        drawText(args, s.c_str(), _insetLeft + x - (s.size() <= 2 ? 5 : 8), _size.y - 2);
+                        drawText(args, s.c_str(), _insetLeft + x - (s.size() <= 2 ? 5 : 8), _size.y - 6);
                     }
                 }
                 hz += spacing;
