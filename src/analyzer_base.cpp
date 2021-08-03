@@ -577,10 +577,9 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
     int x = _insetAround;
     auto textColor = nvgRGBAf(1.f, 1.f, 1.f, 1.f);
 
-
     std::string s = format("PEAKS (±%0.1fHz)", (_module->_core._sampleRate / 2.0f) / (float) (_module->_core._size / _module->_core._binAverageN));
     drawText(args, s.c_str(), _insetLeft - 2, _insetTop + textY, 0, &textColor);
-    x += s.size() * charPx;
+    x += s.size() * charPx + 10;
 
     int spacing = 3;
     if (_size.x > 300) {
@@ -590,7 +589,13 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
 
     for (int i = 0; i < _module->_core._nChannels; ++i) {
         if (_module->_core._channels[i]) {
-            s = format("%c[%7.1fHz]", 'A' + i, _module->_core.getPeak(i, rangeMinHz, rangeMaxHz));
+            float peak = _module->_core.getPeak(i, rangeMinHz, rangeMaxHz);
+
+            s = peak >= 1000.f ?
+                format("%c[%7.3fkHz]", 'A' + i, peak / 1000.f) :
+                format("%c[%7.2fHz]", 'A' + i, peak);
+
+
             drawText(args, s.c_str(), x, _insetTop + textY, 0.0, &_channelColors[i % channelColorsN]);
         }
         x += 9 * charPx + spacing;
@@ -628,7 +633,7 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
             };
 
             line(+12.0, 1.0, " 12", 02.0, _axisColor);
-            line(+00.0, 1.8, "  0", 02.0, nvgRGBAf(0.4f, 0.4f, 0.2f, 1.f));
+            line(+00.0, 1.2, "  0", 02.0, nvgRGBAf(0.35f, 0.35f, 0.25f, 1.f));
             line(-12.0, 1.0, "-12", 02.0, _axisColor);
             line(-24.0, 1.0, "-24", 02.0, _axisColor);
             line(-48.0, 1.0, "-48", 02.0, _axisColor);
