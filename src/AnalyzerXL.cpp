@@ -132,6 +132,7 @@ void AnalyzerXL::processAll(const ProcessArgs &args) {
 
 struct AnalyzerXLWidget : AnalyzerBaseWidget {
     static constexpr int HP = 62;
+    AnalyzerDisplay *display;
 
 
     explicit AnalyzerXLWidget(AnalyzerXL *module) {
@@ -140,9 +141,9 @@ struct AnalyzerXLWidget : AnalyzerBaseWidget {
         setPanel(box.size, "AnalyzerXL", false);
 
         {
-            auto inset = Vec(105, 1);
+            auto inset = Vec(110, 1);
             auto size = Vec(box.size.x - inset.x - 1, 378);
-            auto display = new AnalyzerDisplay(module, size, false);
+            display = new AnalyzerDisplay(module, size, false);
             display->box.pos = inset;
             display->box.size = size;
             addChild(display);
@@ -164,6 +165,22 @@ struct AnalyzerXLWidget : AnalyzerBaseWidget {
         addParam(createParamCentered<Knob26>(signalcInputPosition.plus(Vec(42.9, 3.8)), module, AnalyzerXL::CONTROLC_PARAM));
         addParam(createParamCentered<Knob26>(signaldInputPosition.plus(Vec(42.9, 3.8)), module, AnalyzerXL::CONTROLD_PARAM));
 
+    }
+
+
+    void step() override {
+        Widget::step();
+
+        if (!module) return;
+
+        // redefine color of input channel if connected
+        for (int i = 0; i < 4; i++) {
+            if (module->inputs[AnalyzerXL::SIGNALA_INPUT + i].isConnected()) {
+                auto val = module->params[AnalyzerXL::CONTROLA_PARAM + i].getValue();
+                auto color = AnalyzerXL::scalar2color(val, 1.f);
+                display->_channelColors[i] = color;
+            }
+        }
     }
 
 
