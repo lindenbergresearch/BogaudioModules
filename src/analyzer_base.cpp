@@ -201,12 +201,14 @@ float AnalyzerCore::getPeak(int channel, float minHz, float maxHz) {
     int maxBin = 0;
     int i = std::max(0, (int) (minHz / fWidth));
     int n = std::min(_binsN, 1 + (int) (maxHz / fWidth));
+
     for (; i < n; ++i) {
         if (bins[i] > max) {
             max = bins[i];
             maxBin = i;
         }
     }
+
     return (maxBin + 0.5f) * fWidth;
 }
 
@@ -591,10 +593,10 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
         if (_module->_core._channels[i]) {
             float peak = _module->_core.getPeak(i, rangeMinHz, rangeMaxHz);
 
+            // print as kHz if >1000
             s = peak >= 1000.f ?
                 format("%c[%7.3fkHz]", 'A' + i, peak / 1000.f) :
                 format("%c[%7.2fHz]", 'A' + i, peak);
-
 
             drawText(args, s.c_str(), x, _insetTop + textY, 0.0, &_channelColors[i % channelColorsN]);
         }
@@ -868,22 +870,32 @@ void AnalyzerDisplay::drawGraph(
     float range = (rangeMaxHz - rangeMinHz) / nyquist;
     int pointsN = roundf(binsN * range);
     int pointsOffset = roundf(binsN * (rangeMinHz / nyquist));
+
     nvgSave(args.vg);
     nvgScissor(args.vg, _insetLeft, _insetTop, _graphSize.x, _graphSize.y);
     nvgStrokeColor(args.vg, color);
     nvgStrokeWidth(args.vg, strokeWidth);
     nvgBeginPath(args.vg);
+
+    int height = 0;
+
     for (int i = 0; i < pointsN; ++i) {
         int oi = pointsOffset + i;
         assert(oi < _module->_core._outBufferN);
-        int height = binValueToHeight(bins.at(oi), ampPlot);
+
+        height = i == 0 ?
+                 binValueToHeight(bins.at(oi), ampPlot) :
+                 (height + binValueToHeight(bins.at(oi), ampPlot)) / 2.f;
+
         if (i == 0) {
             nvgMoveTo(args.vg, _insetLeft, _insetTop + (_graphSize.y - height));
         }
+
         float hz = ((float) (pointsOffset + i) + 0.5f) * binHz;
         float x = _graphSize.x * powf((hz - rangeMinHz) / (rangeMaxHz - rangeMinHz), _xAxisLogFactor);
         nvgLineTo(args.vg, _insetLeft + x, _insetTop + (_graphSize.y - height));
     }
+
     nvgStroke(args.vg);
     nvgRestore(args.vg);
 }

@@ -5,15 +5,6 @@
 #include "AnalyzerXL.hpp"
 #include "Ranalyzer.hpp"
 
-
-#include "Test.hpp"
-#include "Test2.hpp"
-#include "TestExpander.hpp"
-#include "TestGl.hpp"
-#include "TestVCF.hpp"
-
-//NEW_INCLUDES_HERE
-
 Plugin *pluginInstance;
 
 
