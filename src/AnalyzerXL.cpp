@@ -131,7 +131,7 @@ void AnalyzerXL::processAll(const ProcessArgs &args) {
 
 
 struct AnalyzerXLWidget : AnalyzerBaseWidget {
-    static constexpr int HP = 62;
+    static constexpr int HP = 70;
     AnalyzerDisplay *display;
 
 
@@ -141,7 +141,7 @@ struct AnalyzerXLWidget : AnalyzerBaseWidget {
         setPanel(box.size, "AnalyzerXL", false);
 
         {
-            auto inset = Vec(110, 1);
+            auto inset = Vec(150, 1);
             auto size = Vec(box.size.x - inset.x - 1, 378);
             display = new AnalyzerDisplay(module, size, false);
             display->box.pos = inset;
