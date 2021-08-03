@@ -251,7 +251,7 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
         bool drawInset
     )
         : _module(module), _size(size), _graphSize(_size.x - _insetLeft - _insetRight, _size.y - _insetTop - _insetBottom), _drawInset(drawInset),
-          _font(APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/Hack-Bold.ttf"))) {
+        _font(APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/VeraMoBd.ttf"))) {
         if (_module) {
             _channelBinsReaderFactories = new BinsReaderFactory[_module->_core._nChannels]{};
             _displayChannel = new bool[_module->_core._nChannels]{};
