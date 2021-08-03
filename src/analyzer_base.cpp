@@ -557,7 +557,7 @@ void AnalyzerDisplay::drawBackground(const DrawArgs &args) {
     nvgSave(args.vg);
     nvgBeginPath(args.vg);
     nvgRect(args.vg, 0, 0, _size.x, _size.y);
-    nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0x00, 0xff));
+    nvgFillColor(args.vg, nvgRGBA(0x10, 0x20, 0x20, 0xff));
     nvgFill(args.vg);
 
     if (_drawInset) {
@@ -572,13 +572,15 @@ void AnalyzerDisplay::drawBackground(const DrawArgs &args) {
 void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float rangeMaxHz) {
     nvgSave(args.vg);
 
-    const int textY = -8;
+    const int textY = -6;
     const int charPx = 7;
-    int x = _insetAround + 12;
+    int x = _insetAround;
+    auto textColor = nvgRGBAf(1.f, 1.f, 1.f, 1.f);
 
-    std::string s = format("Peaks +/-%0.1f", (_module->_core._sampleRate / 2.0f) / (float) (_module->_core._size / _module->_core._binAverageN));
-    drawText(args, s.c_str(), x + _insetLeft, _insetTop + textY);
-    x += s.size() * charPx - 0;
+
+    std::string s = format("PEAKS (±%0.1fHz)", (_module->_core._sampleRate / 2.0f) / (float) (_module->_core._size / _module->_core._binAverageN));
+    drawText(args, s.c_str(), _insetLeft - 2, _insetTop + textY, 0, &textColor);
+    x += s.size() * charPx;
 
     int spacing = 3;
     if (_size.x > 300) {
@@ -588,7 +590,7 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
 
     for (int i = 0; i < _module->_core._nChannels; ++i) {
         if (_module->_core._channels[i]) {
-            s = format("%c:%7.1f", 'A' + i, _module->_core.getPeak(i, rangeMinHz, rangeMaxHz));
+            s = format("%c[%7.1fHz]", 'A' + i, _module->_core.getPeak(i, rangeMinHz, rangeMaxHz));
             drawText(args, s.c_str(), x, _insetTop + textY, 0.0, &_channelColors[i % channelColorsN]);
         }
         x += 9 * charPx + spacing;
@@ -626,7 +628,7 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
             };
 
             line(+12.0, 1.0, " 12", 02.0, _axisColor);
-            line(+00.0, 1.5, "  0", 02.0, nvgRGBAf(0.3f, 0.4f, 0.0f, 1.f));
+            line(+00.0, 1.8, "  0", 02.0, nvgRGBAf(0.4f, 0.4f, 0.2f, 1.f));
             line(-12.0, 1.0, "-12", 02.0, _axisColor);
             line(-24.0, 1.0, "-24", 02.0, _axisColor);
             line(-48.0, 1.0, "-48", 02.0, _axisColor);
@@ -669,7 +671,7 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
 
     nvgBeginPath(args.vg);
     int lineY = _insetTop;
-    nvgStrokeColor(args.vg, nvgRGBAf(0.7f, 0.7f, 0.7f, 1.f));
+    nvgStrokeColor(args.vg, nvgRGBAf(0.5f, 0.5f, 0.5f, 1.f));
     nvgStrokeWidth(args.vg, strokeWidth * 1.2);
     nvgMoveTo(args.vg, lineX, lineY);
     nvgLineTo(args.vg, _size.x - _insetRight, lineY);
