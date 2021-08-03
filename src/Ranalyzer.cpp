@@ -440,4 +440,4 @@ struct RanalyzerWidget : AnalyzerBaseWidget {
 };
 
 
-Model *modelRanalyzer = createModel<Ranalyzer, RanalyzerWidget>("Bogaudio-Ranalyzer", "RANALYZER", "Swept-sine frequency response analyzer", "Visual");
+Model *modelRanalyzer = createModel<Ranalyzer, RanalyzerWidget>("Lindenberg-Bogaudio-Ranalyzer", "RANALYZER", "Swept-sine frequency response analyzer", "Visual");

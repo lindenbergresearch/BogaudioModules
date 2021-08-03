@@ -223,8 +223,8 @@ struct AnalyzerXLWidget : AnalyzerBaseWidget {
 
 auto *modelAnalyzerXL =
     bogaudio::createModel<AnalyzerXL, AnalyzerXLWidget>(
-        "Bogaudio-AnalyzerXL",
-        "ANALYZER-XL",
+        "Lindenberg-Bogaudio-Analyzer2",
+        "ANALYZER-2",
         "4-channel deep spectrum analyzer",
         "Visual"
     );
