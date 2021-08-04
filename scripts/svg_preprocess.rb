@@ -380,17 +380,17 @@ def process(name)
 
   root = doc.at_css(':root')
   if root.node_name == 'module'
-    hp = 3
-    if root['hp'] && !root['hp'].to_s.empty?
-      hp = root['hp'].to_s.to_i
+    HP = 3
+    if root['HP'] && !root['HP'].to_s.empty?
+      HP = root['HP'].to_s.to_i
     end
-    root.delete('hp')
+    root.delete('HP')
     if root['noskin'] && root['noskin'].to_s == 'true'
       noskin = true
     end
     root.delete('noskin')
-    globals['hp'] = hp
-    globals['width'] = hp * 15.0
+    globals['HP'] = HP
+    globals['width'] = HP * 15.0
     globals['height'] = 380.0
 
     root.node_name = 'svg'

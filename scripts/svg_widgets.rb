@@ -48,11 +48,11 @@ void %MODULE%::processChannel(const ProcessArgs& args, int c) {
 }
 
 struct %MODULE%Widget : BGModuleWidget {
-	static constexpr int hp = %HP%;
+	static constexpr int HP = %HP%;
 
 	%MODULE%Widget(%MODULE%* module) {
 		setModule(module);
-		box.size = Vec(RACK_GRID_WIDTH * hp, RACK_GRID_HEIGHT);
+		box.size = Vec(RACK_GRID_WIDTH * HP, RACK_GRID_HEIGHT);
 		setPanel(box.size, "%MODULE%");
 		createScrews();
 
@@ -72,7 +72,7 @@ options = {
   module: 'MODULE',
   plugin: 'PLUGIN',
   manufacturer: 'MANUFACTURER',
-  hp: '10',
+  HP: '10',
   param_class: 'RoundBlackKnob',
   input_class: 'Port24',
   output_class: 'Port24',
@@ -113,8 +113,8 @@ option_parser = OptionParser.new do |opts|
   opts.on('--manufacturer=MANUFACTURER', "Name of the manufacturer (with ---stub-*; default:  #{options[:manufacturer]})") do |v|
     options[:manufacturer] = v
   end
-  opts.on('--hp=HP', "Module width in multiples of RACK_GRID_WIDTH (with --stub-*; default: #{options[:hp]})") do |v|
-    options[:hp] = v if v.to_i > 0
+  opts.on('--HP=HP', "Module width in multiples of RACK_GRID_WIDTH (with --stub-*; default: #{options[:HP]})") do |v|
+    options[:HP] = v if v.to_i > 0
   end
   opts.on('--param-class=CLASS', "Widget type for params (with --creates, --stub-*; default: #{options[:param_class]})") do |v|
     options[:param_class] = v
@@ -292,7 +292,7 @@ def make_stub(widgets_by_type, template, options)
   s.gsub!(/%PLUGIN%/, options[:plugin])
   s.gsub!(/%HEADER%/, options[:plugin].downcase)
   s.gsub!(/%MANUFACTURER%/, options[:manufacturer])
-  s.gsub!(/%HP%/, options[:hp])
+  s.gsub!(/%HP%/, options[:HP])
   s.gsub!(/%ENUMS%/, make_enums(widgets_by_type, false, true))
   if widgets_by_type.empty?
     s.gsub!(/%POSITIONS%/, '')

@@ -5,7 +5,7 @@ require 'optparse'
 options = {
   type: nil,
   name: nil,
-  hp: 3,
+  HP: 3,
   width: 30,
   height: 30,
   noskin: false,
@@ -22,8 +22,8 @@ option_parser = OptionParser.new do |opts|
   opts.on('--name=[module name]', 'With --module, specifies the module name/title; defaults to upcased slug') do |v|
     options[:name] = v if v
   end
-  opts.on('--hp=[module width in HP]', "With --module, sets the module width; default=#{options[:hp]}") do |v|
-    options[:hp] = v.to_i if v
+  opts.on('--HP=[module width in HP]', "With --module, sets the module width; default=#{options[:HP]}") do |v|
+    options[:HP] = v.to_i if v
   end
   opts.on('--width=[widget width]', "With --widget, sets the widget width; default=#{options[:width]}") do |v|
     options[:width] = v.to_f if v
@@ -79,7 +79,7 @@ end
 out = nil
 if options[:type] == 'module'
   href = '#module'
-  case options[:hp]
+  case options[:HP]
   when 0..3
     href += '3'
   when 4..5
@@ -90,12 +90,12 @@ if options[:type] == 'module'
     href += '8'
   end
 
-  out = %Q{<module hp="%d"%s>
+  out = %Q{<module HP="%d"%s>
   <style/>
 
   <def xlink:href="%s" var-name="%s"/>
 </module>}
-  out = out % [options[:hp], options[:noskin] ? ' noskin="true"' : '', href, options[:name]]
+  out = out % [options[:HP], options[:noskin] ? ' noskin="true"' : '', href, options[:name]]
 elsif options[:type] == 'widget'
   out = %Q{<widget width="%0.1f" height="%0.1f">
   <style/>
