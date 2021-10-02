@@ -1,14 +1,12 @@
 #pragma once
 
-#include "assert.h"
-#include <math.h>
+#include <cassert>
+#include <cmath>
 
 #include "ffft/FFTReal.h"
-
 #include "buffer.hpp"
 
-namespace bogaudio {
-namespace dsp {
+namespace bogaudio::dsp {
 
 struct Window {
     int _size;
@@ -193,5 +191,4 @@ struct SpectrumAnalyzer : OverlappingBuffer<float> {
     void getMagnitudes(float *bins, int nBins);
 };
 
-} // namespace dsp
 } // namespace bogaudio
