@@ -15,10 +15,14 @@ void Window::apply(float *in, float *out) {
 
 
 HanningWindow::HanningWindow(int size, float alpha) : Window(size) {
-    const float invAlpha = 1.0 - alpha;
-    const float twoPIEtc = 2.0 * M_PI / (float) size;
+    const float invAlpha = 1.f - alpha;
+    const float twoPIEtc = 2.f * float(M_PI) / float(size);
+
     for (int i = 0; i < _size; ++i) {
-        _sum += _window[i] = invAlpha * cos(twoPIEtc * (float) i + M_PI) + alpha;
+        _sum += _window[i] =
+              invAlpha *
+              cosf(twoPIEtc * float(i) + float(M_PI)) +
+              alpha;
     }
 }
 
@@ -26,8 +30,9 @@ HanningWindow::HanningWindow(int size, float alpha) : Window(size) {
 KaiserWindow::KaiserWindow(int size, float alpha) : Window(size) {
     float ii0a = 1.0f / i0(alpha);
     float ism1 = 1.0f / (float) (size - 1);
+
     for (int i = 0; i < _size; ++i) {
-        float x = i * 2.0f;
+        float x = float(i) * 2.0f;
         x *= ism1;
         x -= 1.0f;
         x *= x;
@@ -43,10 +48,12 @@ KaiserWindow::KaiserWindow(int size, float alpha) : Window(size) {
 float KaiserWindow::i0(float x) {
     assert(x >= 0.0f);
     assert(x < 20.0f);
+
     float y = 0.5f * x;
     float t = .1e-8f;
     float e = 1.0f;
     float de = 1.0f;
+
     for (int i = 1; i <= 25; ++i) {
         de = de * y / (float) i;
         float sde = de * de;
@@ -55,6 +62,7 @@ float KaiserWindow::i0(float x) {
             break;
         }
     }
+
     return e;
 }
 
@@ -69,9 +77,11 @@ PlanckTaperWindow::PlanckTaperWindow(int size, int taperSamples) : Window(size) 
         x = 1.0f / x;
         _sum += _window[i] = x;
     }
+
     int nOnes = size - 2 * taperSamples;
     std::fill_n(_window + taperSamples, nOnes, 1.0f);
-    _sum += nOnes;
+    _sum += float(nOnes);
+
     for (int i = 0; i < taperSamples; ++i) {
         _sum += _window[size - 1 - i] = _window[i];
     }
@@ -174,10 +184,13 @@ SpectrumAnalyzer::SpectrumAnalyzer(
       WindowType windowType,
       float sampleRate,
       bool autoProcess
-)
-      : OverlappingBuffer(size, overlap, autoProcess), _sampleRate(sampleRate) {
+) : OverlappingBuffer(
+      size,
+      overlap,
+      autoProcess
+), _sampleRate(sampleRate) {
     assert(size <= maxSize);
-    assert(_sampleRate > size);
+    assert(_sampleRate > int(size));
 
     switch (size) {
         case SIZE_1024: {
@@ -261,10 +274,12 @@ SpectrumAnalyzer::~SpectrumAnalyzer() {
 
 void SpectrumAnalyzer::processBuffer(float *samples) {
     float *input = samples;
+
     if (_window) {
         _window->apply(samples, _windowOut);
         input = _windowOut;
     }
+
     if (_fft1024) {
         _fft1024->do_fft(_fftOut, input);
     } else if (_fft4096) {
@@ -287,15 +302,19 @@ void SpectrumAnalyzer::getMagnitudes(float *bins, int nBins) {
 
     const int bands = _size / 2;
     const int binWidth = bands / nBins;
-    const float invBinWidth = 1.0 / (float) binWidth;
-    const float normalization = 2.0 / powf(_window ? _window->sum() : _size, 2.0);
+    const float invBinWidth = 1.f / (float) binWidth;
+    const float normalization = 2.f / powf(_window ? _window->sum() : float(_size), 2.f);
 
     for (int bin = 0; bin < nBins; ++bin) {
         float sum = 0.0;
         int binEnd = bin * binWidth + binWidth;
 
         for (int i = binEnd - binWidth; i < binEnd; ++i) {
-            sum += (_fftOut[i] * _fftOut[i] + _fftOut[i + bands] * _fftOut[i + bands]) * normalization;
+            sum += (_fftOut[i] *
+                    _fftOut[i] +
+                    _fftOut[i + bands] *
+                    _fftOut[i + bands]
+                   ) * normalization;
         }
 
         bins[bin] = sum * invBinWidth;
