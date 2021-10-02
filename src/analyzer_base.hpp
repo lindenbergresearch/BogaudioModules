@@ -288,7 +288,7 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
     void drawFreezeUnder(const DrawArgs &args, float lowHz, float highHz, float rangeMinHz, float rangeMaxHz, float strokeWidth);
     void drawFreezeOver(const DrawArgs &args, int binI, int binsN, float lowHz, float highHz, float strokeWidth);
     void drawText(const DrawArgs &args, const char *s, float x, float y, float rotation = 0.0, const NVGcolor *color = NULL, int fontSize = 12);
-    int binValueToHeight(float value, AmplitudePlot plot);
+    double binValueToHeight(float value, AmplitudePlot plot);
     static float binValueToAmplitude(float value);
     static float binValueToDb(float value);
     static float dbToBinValue(float db);
