@@ -70,27 +70,41 @@ struct RoundingParamQuantity : Base {
 
 struct AmplifierParamQuantity : ParamQuantity {
     virtual bool isLinear();
+
+
     virtual void setUnits(bool linear);
+
+
     float getDisplayValue() override;
+
+
     void setDisplayValue(float displayValue) override;
 };
 
 
 struct FrequencyParamQuantity : ParamQuantity {
     virtual float offset();
+
+
     float getDisplayValue() override;
+
+
     void setDisplayValue(float v) override;
 };
 
 
 struct DynamicsRatioParamQuantity : ParamQuantity {
     float getDisplayValue() override;
+
+
     void setDisplayValue(float v) override;
 };
 
 
 struct EQParamQuantity : ParamQuantity {
     float getDisplayValue() override;
+
+
     void setDisplayValue(float displayValue) override;
 };
 

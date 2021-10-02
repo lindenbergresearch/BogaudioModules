@@ -117,7 +117,7 @@ struct Ranalyzer : AnalyzerBase {
 
 
     Ranalyzer()
-        : AnalyzerBase(3, NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, 0, SpectrumAnalyzer::OVERLAP_1), _inputBuffer(maxResponseDelay, 0.0f) {
+          : AnalyzerBase(3, NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, 0, SpectrumAnalyzer::OVERLAP_1), _inputBuffer(maxResponseDelay, 0.0f) {
         configParam<FrequencyParamQuantity>(FREQUENCY1_PARAM, 0.0f, 1.0f, 0.0f, "Frequency 1", " Hz");
         configParam<FrequencyParamQuantity>(FREQUENCY2_PARAM, 0.0f, 1.0f, 1.0f, "Frequency 2", " Hz");
         configParam(TRIGGER_PARAM, 0.0f, 1.0f, 0.0f, "Trigger");
@@ -140,13 +140,29 @@ struct Ranalyzer : AnalyzerBase {
 
 
     void reset() override;
+
+
     void sampleRateChange() override;
+
+
     json_t *toJson(json_t *root) override;
+
+
     void fromJson(json_t *root) override;
+
+
     void modulate() override;
+
+
     void processAll(const ProcessArgs &args) override;
+
+
     void setDisplayTraces(Traces traces);
+
+
     void setChannelDisplayListener(ChannelDisplayListener *listener);
+
+
     void setWindow(WindowType wt);
 };
 

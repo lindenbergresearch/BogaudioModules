@@ -22,6 +22,7 @@ struct SkinnableWidget : SkinChangeListener {
 struct Screw : SvgScrew, SkinnableWidget {
     Screw();
 
+
     void skinChanged(const std::string &skin) override;
 };
 
@@ -29,9 +30,13 @@ struct Screw : SvgScrew, SkinnableWidget {
 struct BGKnob : RoundKnob, SkinnableWidget {
     std::string _svgBase;
 
+
     BGKnob(const char *svgBase, int dim);
 
+
     void redraw();
+
+
     void skinChanged(const std::string &skin) override;
 };
 
@@ -80,7 +85,10 @@ struct IndicatorKnob : Knob, SkinnableWidget {
         std::function<bool()> _drawColorsCB;
         std::function<bool()> _unipolarCB;
 
+
         void setAngle(float a);
+
+
         void draw(const DrawArgs &args) override;
     };
 
@@ -89,8 +97,13 @@ struct IndicatorKnob : Knob, SkinnableWidget {
     CircularShadow *shadow;
     IKWidget *w;
 
+
     IndicatorKnob(int dim);
+
+
     void onHover(const event::Hover &e) override;
+
+
     void onChange(const event::Change &e) override;
 
 
@@ -101,6 +114,8 @@ struct IndicatorKnob : Knob, SkinnableWidget {
 
 
     void redraw();
+
+
     void skinChanged(const std::string &skin) override;
 };
 
@@ -113,6 +128,7 @@ struct IndicatorKnob19 : IndicatorKnob {
 struct Port24 : SvgPort, SkinnableWidget {
     Port24();
 
+
     void skinChanged(const std::string &skin) override;
 };
 
@@ -124,6 +140,8 @@ struct BlankPort24 : SvgPort {
 
 struct SliderSwitch : SvgSwitch {
     CircularShadow *shadow = NULL;
+
+
     SliderSwitch();
 };
 
@@ -143,10 +161,19 @@ struct StatefulButton : ParamWidget {
     SvgWidget *_svgWidget; // deleted elsewhere.
     CircularShadow *shadow = NULL;
 
+
     StatefulButton(const char *offSvgPath, const char *onSvgPath);
+
+
     void reset() override;
+
+
     void randomize() override;
+
+
     void onDragStart(const event::DragStart &e) override;
+
+
     void onDragEnd(const event::DragEnd &e) override;
 
 
@@ -188,6 +215,8 @@ struct InvertingIndicatorButton : ParamWidget {
 
 
         void setValue(float v);
+
+
         void draw(const DrawArgs &args) override;
     };
 
@@ -197,6 +226,7 @@ struct InvertingIndicatorButton : ParamWidget {
     IIBWidget *w;
     std::function<bool()> clickToInvertCB;
     std::function<void(int, float)> onChangeCB;
+
 
     InvertingIndicatorButton(int dim);
 
@@ -208,7 +238,11 @@ struct InvertingIndicatorButton : ParamWidget {
 
 
     void reset() override;
+
+
     void randomize() override;
+
+
     void onHover(const event::Hover &e) override;
 
 
@@ -216,6 +250,8 @@ struct InvertingIndicatorButton : ParamWidget {
 
 
     void onButton(const event::Button &e) override;
+
+
     void onChange(const event::Change &e) override;
 };
 

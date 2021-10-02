@@ -293,7 +293,7 @@ struct AnalysisBinsReader : AnalyzerDisplay::BinsReader {
 
 struct RanalyzerDisplay : AnalyzerDisplay, ChannelDisplayListener {
     RanalyzerDisplay(Ranalyzer *module, Vec size, bool drawInset)
-        : AnalyzerDisplay(module, size, drawInset) {}
+          : AnalyzerDisplay(module, size, drawInset) {}
 
 
     void displayChannels(bool c0, bool c1, bool c2) override {

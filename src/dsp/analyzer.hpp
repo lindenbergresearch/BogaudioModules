@@ -16,8 +16,9 @@ struct Window {
     float _sum;
 
 
-    Window(int size)
-        : _size(size), _window(new float[_size]{}), _sum(0.0) {}
+    Window(int size) : _size(size), _window(new float[_size]{}), _sum(0.0) {
+
+    }
 
 
     virtual ~Window() {
@@ -54,6 +55,7 @@ struct HammingWindow : HanningWindow {
 struct KaiserWindow : Window {
     KaiserWindow(int size, float alpha = 7.865f);
 
+
     float i0(float x);
 };
 
@@ -65,8 +67,13 @@ struct PlanckTaperWindow : Window {
 
 struct FFT1024 {
     void *_fft = NULL;
+
+
     FFT1024();
+
+
     ~FFT1024();
+
 
     void do_fft(float *out, float *in);
 };
@@ -74,8 +81,13 @@ struct FFT1024 {
 
 struct FFT4096 {
     void *_fft = NULL;
+
+
     FFT4096();
+
+
     ~FFT4096();
+
 
     void do_fft(float *out, float *in);
 };
@@ -83,8 +95,13 @@ struct FFT4096 {
 
 struct FFT8192 {
     void *_fft = NULL;
+
+
     FFT8192();
+
+
     ~FFT8192();
+
 
     void do_fft(float *out, float *in);
 };
@@ -92,8 +109,13 @@ struct FFT8192 {
 
 struct FFT16384 {
     void *_fft = NULL;
+
+
     FFT16384();
+
+
     ~FFT16384();
+
 
     void do_fft(float *out, float *in);
 };
@@ -101,8 +123,13 @@ struct FFT16384 {
 
 struct FFT32768 {
     void *_fft = NULL;
+
+
     FFT32768();
+
+
     ~FFT32768();
+
 
     void do_fft(float *out, float *in);
 };
@@ -147,16 +174,22 @@ struct SpectrumAnalyzer : OverlappingBuffer<float> {
     float *_windowOut = NULL;
     float *_fftOut = NULL;
 
+
     SpectrumAnalyzer(
-        Size size,
-        Overlap overlap,
-        WindowType windowType,
-        float sampleRate,
-        bool autoProcess = true
+          Size size,
+          Overlap overlap,
+          WindowType windowType,
+          float sampleRate,
+          bool autoProcess = true
     );
+
+
     virtual ~SpectrumAnalyzer();
 
+
     void processBuffer(float *samples) override;
+
+
     void getMagnitudes(float *bins, int nBins);
 };
 

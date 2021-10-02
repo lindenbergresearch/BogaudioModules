@@ -36,19 +36,19 @@ struct ChannelAnalyzer {
 
 
     ChannelAnalyzer(
-        SpectrumAnalyzer::Size size,
-        SpectrumAnalyzer::Overlap overlap,
-        SpectrumAnalyzer::WindowType windowType,
-        float sampleRate,
-        int averageN,
-        int binSize,
-        float *outBuf1,
-        float *outBuf2,
-        std::atomic<float *> &currentOutBuf
+          SpectrumAnalyzer::Size size,
+          SpectrumAnalyzer::Overlap overlap,
+          SpectrumAnalyzer::WindowType windowType,
+          float sampleRate,
+          int averageN,
+          int binSize,
+          float *outBuf1,
+          float *outBuf2,
+          std::atomic<float *> &currentOutBuf
     )
-        : _analyzer(size, overlap, windowType, sampleRate, false), _binsN(size / binSize), _bins0(outBuf1), _bins1(outBuf2), _currentBins(_bins0), _currentOutBuf(currentOutBuf),
-          _averagedBins(averageN == 1 ? NULL : new AveragingBuffer<float>(_binsN, averageN)), _stepBufN(size / overlap), _stepBuf(new float[_stepBufN]{}), _workerBufN(size + 1),
-          _workerBuf(new float[_workerBufN]{}), _worker(&ChannelAnalyzer::work, this) {
+          : _analyzer(size, overlap, windowType, sampleRate, false), _binsN(size / binSize), _bins0(outBuf1), _bins1(outBuf2), _currentBins(_bins0), _currentOutBuf(currentOutBuf),
+            _averagedBins(averageN == 1 ? NULL : new AveragingBuffer<float>(_binsN, averageN)), _stepBufN(size / overlap), _stepBuf(new float[_stepBufN]{}), _workerBufN(size + 1),
+            _workerBuf(new float[_workerBufN]{}), _worker(&ChannelAnalyzer::work, this) {
         assert(averageN >= 1);
         assert(binSize >= 1);
     }
@@ -56,7 +56,10 @@ struct ChannelAnalyzer {
 
     virtual ~ChannelAnalyzer();
 
+
     void step(float sample);
+
+
     void work();
 };
 
@@ -94,8 +97,8 @@ struct AnalyzerCore {
 
 
     AnalyzerCore(int nChannels, SpectrumAnalyzer::Overlap overlap = SpectrumAnalyzer::OVERLAP_2)
-        : _nChannels(nChannels), _channels(new ChannelAnalyzer *[_nChannels]{}), _outBufs(new float[2 * nChannels * _outBufferN]{}), _currentOutBufs(new std::atomic<float *>[nChannels]),
-          _overlap(overlap) {
+          : _nChannels(nChannels), _channels(new ChannelAnalyzer *[_nChannels]{}), _outBufs(new float[2 * nChannels * _outBufferN]{}), _currentOutBufs(new std::atomic<float *>[nChannels]),
+            _overlap(overlap) {
         for (int i = 0; i < nChannels; ++i) {
             _currentOutBufs[i] = _outBufs + 2 * i * _outBufferN;
         }
@@ -111,9 +114,17 @@ struct AnalyzerCore {
 
 
     void setParams(float sampleRate, int averageN, Quality quality, Window window);
+
+
     void resetChannels();
+
+
     void resetChannelsLocked();
+
+
     SpectrumAnalyzer::Size size();
+
+
     SpectrumAnalyzer::WindowType window();
 
 
@@ -124,7 +135,11 @@ struct AnalyzerCore {
 
 
     float getPeak(int channel, float minHz, float maxHz);
+
+
     void stepChannel(int channelIndex, Input &input);
+
+
     void stepChannelSample(int channelIndex, float sample);
 };
 
@@ -153,30 +168,44 @@ struct AnalyzerBase : BGModule, AnalyzerTypes {
 
 
     AnalyzerBase(
-        int nChannels,
-        int np,
-        int ni,
-        int no,
-        int nl = 0,
-        SpectrumAnalyzer::Overlap overlap = SpectrumAnalyzer::OVERLAP_2
+          int nChannels,
+          int np,
+          int ni,
+          int no,
+          int nl = 0,
+          SpectrumAnalyzer::Overlap overlap = SpectrumAnalyzer::OVERLAP_2
     )
-        : _core(nChannels, overlap) {
+          : _core(nChannels, overlap) {
         config(np, ni, no, nl);
     }
 
 
     void frequencyPlotToJson(json_t *root);
+
+
     void frequencyPlotFromJson(json_t *root);
+
+
     void frequencyRangeToJson(json_t *root);
+
+
     void frequencyRangeFromJson(json_t *root);
+
+
     void amplitudePlotToJson(json_t *root);
+
+
     void amplitudePlotFromJson(json_t *root);
 };
 
 
 struct AnalyzerBaseWidget : BGModuleWidget {
     void addFrequencyPlotContextMenu(Menu *menu);
+
+
     void addFrequencyRangeContextMenu(Menu *menu);
+
+
     void addAmplitudePlotContextMenu(Menu *menu, bool linearOption = true);
 };
 
@@ -223,10 +252,10 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
 
     static constexpr int channelColorsN = 4;
     NVGcolor _channelColors[channelColorsN] = {
-        nvgRGBA(0x00, 0xff, 0x00, 0xd0),
-        nvgRGBA(0xff, 0x00, 0xff, 0xd0),
-        nvgRGBA(0xff, 0x80, 0x00, 0xd0),
-        nvgRGBA(0x00, 0x80, 0xff, 0xd0)
+          nvgRGBA(0x00, 0xff, 0x00, 0xd0),
+          nvgRGBA(0xff, 0x00, 0xff, 0xd0),
+          nvgRGBA(0xff, 0x80, 0x00, 0xd0),
+          nvgRGBA(0x00, 0x80, 0xff, 0xd0)
     };
 
     AnalyzerBase *_module;
@@ -246,12 +275,12 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
 
 
     AnalyzerDisplay(
-        AnalyzerBase *module,
-        Vec size,
-        bool drawInset
+          AnalyzerBase *module,
+          Vec size,
+          bool drawInset
     )
-        : _module(module), _size(size), _graphSize(_size.x - _insetLeft - _insetRight, _size.y - _insetTop - _insetBottom), _drawInset(drawInset),
-        _font(APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/VeraMoBd.ttf"))) {
+          : _module(module), _size(size), _graphSize(_size.x - _insetLeft - _insetRight, _size.y - _insetTop - _insetBottom), _drawInset(drawInset),
+            _font(APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/VeraMoBd.ttf"))) {
         if (_module) {
             _channelBinsReaderFactories = new BinsReaderFactory[_module->_core._nChannels]{};
             _displayChannel = new bool[_module->_core._nChannels]{};
@@ -271,26 +300,68 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
 
 
     void onButton(const event::Button &e) override;
+
+
     void onDragMove(const event::DragMove &e) override;
+
+
     void onDragEnd(const event::DragEnd &e) override;
+
+
     void onHoverKey(const event::HoverKey &e) override;
+
+
     void setChannelBinsReaderFactory(int channel, BinsReaderFactory brf);
+
+
     void displayChannel(int channel, bool display);
+
+
     void channelLabel(int channel, std::string label);
+
+
     void draw(const DrawArgs &args) override;
+
+
     void drawBackground(const DrawArgs &args);
+
+
     virtual void drawHeader(const DrawArgs &args, float rangeMinHz, float rangeMaxHz);
+
+
     void drawYAxis(const DrawArgs &args, float strokeWidth, AmplitudePlot plot);
+
+
     void drawXAxis(const DrawArgs &args, float strokeWidth, FrequencyPlot plot, float rangeMinHz, float rangeMaxHz);
+
+
     void drawXAxisLine(const DrawArgs &args, float hz, float rangeMinHz, float rangeMaxHz);
+
+
     void drawGraph(const DrawArgs &args, BinsReader &bins, NVGcolor color, float strokeWidth, FrequencyPlot freqPlot, float rangeMinHz, float rangeMaxHz, AmplitudePlot ampPlot);
+
+
     void freezeValues(float rangeMinHz, float rangeMaxHz, int &binI, float &lowHz, float &highHz);
+
+
     void drawFreezeUnder(const DrawArgs &args, float lowHz, float highHz, float rangeMinHz, float rangeMaxHz, float strokeWidth);
+
+
     void drawFreezeOver(const DrawArgs &args, int binI, int binsN, float lowHz, float highHz, float strokeWidth);
+
+
     void drawText(const DrawArgs &args, const char *s, float x, float y, float rotation = 0.0, const NVGcolor *color = NULL, int fontSize = 12);
+
+
     double binValueToHeight(float value, AmplitudePlot plot);
+
+
     static float binValueToAmplitude(float value);
+
+
     static float binValueToDb(float value);
+
+
     static float dbToBinValue(float db);
 };
 

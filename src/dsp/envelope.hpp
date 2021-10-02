@@ -54,12 +54,26 @@ struct ADSR : EnvelopeGenerator {
 
 
     void reset();
+
+
     void setGate(bool high);
+
+
     void setAttack(float seconds);
+
+
     void setDecay(float seconds);
+
+
     void setSustain(float level);
+
+
     void setRelease(float seconds);
+
+
     void setLinearShape(bool linear);
+
+
     void setShapes(float attackShape, float decayShape, float releaseShape);
 
 
@@ -67,6 +81,7 @@ struct ADSR : EnvelopeGenerator {
 
 
     void retrigger();
+
 
     float _next() override;
 };

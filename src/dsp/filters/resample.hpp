@@ -14,6 +14,8 @@ struct Decimator {
 
 
     virtual void setParams(float sampleRate, int factor) = 0;
+
+
     virtual float next(const float *buf) = 0;
 };
 
@@ -29,6 +31,8 @@ struct LPFDecimator : Decimator {
 
 
     void setParams(float sampleRate, int factor) override;
+
+
     float next(const float *buf) override;
 };
 
@@ -42,10 +46,16 @@ struct CICDecimator : Decimator {
     int _factor = 0;
     float _gainCorrection;
 
+
     CICDecimator(int stages = 4, int factor = 8);
+
+
     virtual ~CICDecimator();
 
+
     void setParams(float sampleRate, int factor) override;
+
+
     float next(const float *buf) override;
 };
 
@@ -58,6 +68,8 @@ struct Interpolator {
 
 
     virtual void setParams(float sampleRate, int factor) = 0;
+
+
     virtual void next(float sample, float *buf) = 0;
 };
 
@@ -72,10 +84,16 @@ struct CICInterpolator : Interpolator {
     int _factor = 0;
     float _gainCorrection;
 
+
     CICInterpolator(int stages = 4, int factor = 8);
+
+
     virtual ~CICInterpolator();
 
+
     void setParams(float sampleRate, int factor) override;
+
+
     void next(float sample, float *buf) override;
 };
 

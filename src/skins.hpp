@@ -40,7 +40,10 @@ public:
 
 
     Skins(const Skins &) = delete;
+
+
     void operator=(const Skins &) = delete;
+
 
     static Skins &skins();
 
@@ -52,14 +55,26 @@ public:
 
 
     bool validKey(const std::string &key) const;
+
+
     const char *skinCssValue(const std::string &skinKey, const std::string &valueKey) const;
+
+
     static NVGcolor cssColorToNVGColor(const char *color, const NVGcolor &ifError);
 
+
     void setDefaultSkin(std::string skinKey);
+
+
     void registerDefaultSkinChangeListener(DefaultSkinChangeListener *listener);
+
+
     void deregisterDefaultSkinChangeListener(DefaultSkinChangeListener *listener);
+
 
 private:
     void loadSkins();
+
+
     void loadCssValues();
 };

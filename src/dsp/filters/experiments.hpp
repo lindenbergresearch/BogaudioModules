@@ -19,12 +19,14 @@ struct ComplexBiquadFilter : BiquadFilter<float> {
 
 
     void setComplexParams(
-        float gain,
-        float zeroRadius,
-        float zeroTheta,
-        float poleRadius,
-        float poleTheta
+          float gain,
+          float zeroRadius,
+          float zeroTheta,
+          float poleRadius,
+          float poleTheta
     );
+
+
     void updateParams();
 };
 
@@ -49,12 +51,14 @@ struct MultipoleFilter : Filter {
 
 
     void setParams(
-        Type type,
-        int poles,
-        float sampleRate,
-        float cutoff,
-        float ripple // FIXME: using this with more than two poles creates large gain, need compensation.
+          Type type,
+          int poles,
+          float sampleRate,
+          float cutoff,
+          float ripple // FIXME: using this with more than two poles creates large gain, need compensation.
     );
+
+
     float next(float sample) override;
 };
 

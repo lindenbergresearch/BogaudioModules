@@ -169,13 +169,13 @@ void FFT32768::do_fft(float *out, float *in) {
 
 
 SpectrumAnalyzer::SpectrumAnalyzer(
-    Size size,
-    Overlap overlap,
-    WindowType windowType,
-    float sampleRate,
-    bool autoProcess
+      Size size,
+      Overlap overlap,
+      WindowType windowType,
+      float sampleRate,
+      bool autoProcess
 )
-    : OverlappingBuffer(size, overlap, autoProcess), _sampleRate(sampleRate) {
+      : OverlappingBuffer(size, overlap, autoProcess), _sampleRate(sampleRate) {
     assert(size <= maxSize);
     assert(_sampleRate > size);
 
@@ -289,12 +289,15 @@ void SpectrumAnalyzer::getMagnitudes(float *bins, int nBins) {
     const int binWidth = bands / nBins;
     const float invBinWidth = 1.0 / (float) binWidth;
     const float normalization = 2.0 / powf(_window ? _window->sum() : _size, 2.0);
+
     for (int bin = 0; bin < nBins; ++bin) {
         float sum = 0.0;
         int binEnd = bin * binWidth + binWidth;
+
         for (int i = binEnd - binWidth; i < binEnd; ++i) {
             sum += (_fftOut[i] * _fftOut[i] + _fftOut[i + bands] * _fftOut[i + bands]) * normalization;
         }
+
         bins[bin] = sum * invBinWidth;
     }
 }

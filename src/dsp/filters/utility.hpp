@@ -10,13 +10,14 @@ struct DCBlocker : Filter {
     float _lastIn = 0.0f;
     float _lastOut = 0.0f;
 
+
     float next(float sample) override;
 };
 
 
 struct AverageRectifiedValue : RunningAverage {
     AverageRectifiedValue(float sampleRate = 1000.0f, float sensitivity = 1.0f, float maxDelayMS = 300.0f)
-        : RunningAverage(sampleRate, sensitivity, maxDelayMS) {
+          : RunningAverage(sampleRate, sensitivity, maxDelayMS) {
     }
 
 
@@ -29,7 +30,7 @@ struct FastRootMeanSquare : AverageRectifiedValue {
 
 
     FastRootMeanSquare(float sampleRate = 1000.0f, float sensitivity = 1.0f, float maxDelayMS = 300.0f)
-        : AverageRectifiedValue(sampleRate, sensitivity, maxDelayMS) {
+          : AverageRectifiedValue(sampleRate, sensitivity, maxDelayMS) {
     }
 
 
@@ -39,7 +40,7 @@ struct FastRootMeanSquare : AverageRectifiedValue {
 
 struct PureRootMeanSquare : RunningAverage {
     PureRootMeanSquare(float sampleRate = 1000.0f, float sensitivity = 1.0f, float maxDelayMS = 300.0f)
-        : RunningAverage(sampleRate, sensitivity, maxDelayMS) {
+          : RunningAverage(sampleRate, sensitivity, maxDelayMS) {
     }
 
 
@@ -55,7 +56,10 @@ struct PucketteEnvelopeFollower {
     DCBlocker _dcBlocker;
     LowPassFilter _filter;
 
+
     void setParams(float sampleRate, float sensitivity);
+
+
     float next(float sample);
 };
 

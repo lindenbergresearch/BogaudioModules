@@ -168,22 +168,22 @@ void BGModuleWidget::appendContextMenu(Menu *menu) {
             for (auto skin : skins->available()) {
                 std::string key = skin.key;
                 s->addItem(
-                    OptionMenuItem(
-                        skin.display.c_str(),
-                        [m, key]() { return m->_skin == key; },
-                        [m, key]() { m->setSkin(key); }
-                    ));
+                      OptionMenuItem(
+                            skin.display.c_str(),
+                            [m, key]() { return m->_skin == key; },
+                            [m, key]() { m->setSkin(key); }
+                      ));
             }
 
             s->addSpacer();
             for (auto skin : skins->available()) {
                 std::string key = skin.key;
                 s->addItem(
-                    OptionMenuItem(
-                        (std::string("Default to ") + skin.display).c_str(),
-                        [key, skins]() { return skins->defaultKey() == key; },
-                        [key, skins]() { skins->setDefaultSkin(key); }
-                    ));
+                      OptionMenuItem(
+                            (std::string("Default to ") + skin.display).c_str(),
+                            [key, skins]() { return skins->defaultKey() == key; },
+                            [key, skins]() { skins->setDefaultSkin(key); }
+                      ));
             }
 
             OptionsMenuItem::addToMenu(s, menu);

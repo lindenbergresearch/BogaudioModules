@@ -40,6 +40,7 @@ public:
 
     void generate();
 
+
 protected:
     virtual void _generate() = 0;
 };
@@ -65,6 +66,8 @@ private:
 
 public:
     StaticTable(const StaticTable &) = delete;
+
+
     void operator=(const StaticTable &) = delete;
 
 

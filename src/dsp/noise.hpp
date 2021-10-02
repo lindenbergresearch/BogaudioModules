@@ -11,13 +11,23 @@ namespace dsp {
 class Seeds {
 private:
     std::mt19937 _generator;
+
+
     Seeds();
+
+
     unsigned int _next();
+
 
 public:
     Seeds(const Seeds &) = delete;
+
+
     void operator=(const Seeds &) = delete;
+
+
     static Seeds &getInstance();
+
 
     static unsigned int next();
 };
@@ -113,20 +123,26 @@ struct RandomWalk : Generator {
 
 
     RandomWalk(
-        float min = -5.0f,
-        float max = 5.0f,
-        float sampleRate = 1000.0f,
-        float change = 0.5f
+          float min = -5.0f,
+          float max = 5.0f,
+          float sampleRate = 1000.0f,
+          float change = 0.5f
     )
-        : _min(min), _max(max) {
+          : _min(min), _max(max) {
         assert(_min < _max);
         setParams(sampleRate, change);
     }
 
 
     void setParams(float sampleRate = 1000.0f, float change = 0.5f);
+
+
     void jump();
+
+
     void tell(float v);
+
+
     float _next() override;
 };
 

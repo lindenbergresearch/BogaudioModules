@@ -50,6 +50,8 @@ struct Amplifier {
 
 
     void setLevel(float db);
+
+
     float next(float s);
 };
 
@@ -83,8 +85,14 @@ struct RunningAverage {
 
 
     void setSampleRate(float sampleRate);
+
+
     void setSensitivity(float sensitivity);
+
+
     void reset();
+
+
     virtual float next(float sample);
 };
 
@@ -106,12 +114,14 @@ struct PositiveZeroCrossing {
 
 
     PositiveZeroCrossing(bool triggerable = true)
-        : _triggerable(triggerable) {
+          : _triggerable(triggerable) {
         reset();
     }
 
 
     bool next(float sample);
+
+
     void reset();
 };
 
@@ -158,6 +168,8 @@ struct ShapedSlewLimiter {
 
 
     void setParams(float sampleRate, float milliseconds, float shape);
+
+
     float next(float sample);
 };
 
@@ -173,6 +185,8 @@ struct Integrator {
 
 
     void setParams(float alpha);
+
+
     float next(float sample);
 };
 
@@ -193,10 +207,12 @@ struct CrossFader {
 
 
     void setParams(
-        float mix, // -1 to 1, 0 for equal output of both inputs.
-        float curve = 1.0f, // -1 to 1: at -1, A will cut fully as mix goes to 0; at 0, A cuts over full mix; at 1, A cuts from 0 to 1.  B symmetric.
-        bool linear = true// cut is linear in amplitude if true; linear in decibels otherwise.
+          float mix, // -1 to 1, 0 for equal output of both inputs.
+          float curve = 1.0f, // -1 to 1: at -1, A will cut fully as mix goes to 0; at 0, A cuts over full mix; at 1, A cuts from 0 to 1.  B symmetric.
+          bool linear = true// cut is linear in amplitude if true; linear in decibels otherwise.
     );
+
+
     float next(float a, float b);
 };
 
@@ -242,8 +258,14 @@ struct DelayLine {
 
 
     void setSampleRate(float sampleRate);
+
+
     void setTime(float time);
+
+
     float next(float sample);
+
+
     int delaySamples();
 };
 
@@ -261,6 +283,8 @@ struct Limiter {
 
 
     void setParams(float shape = 1.0f, float knee = 5.0f, float limit = 10.0f, float scale = 2.0f);
+
+
     float next(float sample);
 };
 
@@ -268,18 +292,23 @@ struct Limiter {
 struct Saturator {
     static const float limit;
 
+
     float next(float sample);
 };
 
 
 struct Compressor {
     static const float maxEffectiveRatio;
+
+
     float compressionDb(float detectorDb, float thresholdDb, float ratio, bool softKnee);
 };
 
 
 struct NoiseGate {
     static const float maxEffectiveRatio;
+
+
     float compressionDb(float detectorDb, float thresholdDb, float ratio, bool softKnee);
 };
 
@@ -297,7 +326,11 @@ struct Timer {
 
 
     void setParams(float sampleRate = 1000.0f, float time = 1.0f);
+
+
     void reset();
+
+
     bool next();
 };
 

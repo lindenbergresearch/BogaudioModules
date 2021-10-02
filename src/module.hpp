@@ -41,9 +41,17 @@ struct BGModule : Module {
 
 
     void onReset() override;
+
+
     void onSampleRateChange() override;
+
+
     json_t *dataToJson() override;
+
+
     void dataFromJson(json_t *root) override;
+
+
     void process(const ProcessArgs &args) override;
 
 
@@ -93,6 +101,8 @@ struct BGModule : Module {
     virtual void postProcessAlways(const ProcessArgs &args) {} // modulate() may not have been called.
 
     void setSkin(std::string skin);
+
+
     void addSkinChangeListener(SkinChangeListener *listener);
 };
 
@@ -104,12 +114,22 @@ struct BGModuleWidget : ModuleWidget, SkinChangeListener, DefaultSkinChangeListe
     std::string _slug;
     std::string _loadedSkin;
 
+
     BGModuleWidget();
+
+
     virtual ~BGModuleWidget();
 
+
     void appendContextMenu(Menu *menu) override;
+
+
     void addParam(ParamWidget *param);
+
+
     void addInput(PortWidget *input);
+
+
     void addOutput(PortWidget *output);
 
 
@@ -117,9 +137,17 @@ struct BGModuleWidget : ModuleWidget, SkinChangeListener, DefaultSkinChangeListe
 
 
     void skinChanged(const std::string &skin) override;
+
+
     void defaultSkinChanged(const std::string &skin) override;
+
+
     void setPanel(Vec size, const std::string slug, bool skinnable = true);
+
+
     void updatePanel();
+
+
     void createScrews();
 };
 

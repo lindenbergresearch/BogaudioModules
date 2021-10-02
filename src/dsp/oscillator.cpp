@@ -247,11 +247,11 @@ float TriangleOscillator::nextForPhase(phase_t phase) {
 
 
 SteppedRandomOscillator::SteppedRandomOscillator(
-    float sampleRate,
-    float frequency,
-    phase_t seed
+      float sampleRate,
+      float frequency,
+      phase_t seed
 )
-    : Phasor(sampleRate, frequency), _n(4096), _k(4093) // prime less than _n
+      : Phasor(sampleRate, frequency), _n(4096), _k(4093) // prime less than _n
 {
     if (seed == 0) {
         _seed = Seeds::getInstance().next();

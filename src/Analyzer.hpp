@@ -62,10 +62,20 @@ struct Analyzer : AnalyzerBase {
 
 
     void reset() override;
+
+
     void sampleRateChange() override;
+
+
     json_t *toJson(json_t *root) override;
+
+
     void fromJson(json_t *root) override;
+
+
     void modulate() override;
+
+
     void processAll(const ProcessArgs &args) override;
 };
 

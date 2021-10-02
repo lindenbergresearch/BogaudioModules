@@ -31,20 +31,24 @@ struct MixerChannel {
 
 
     MixerChannel(
-        Param &level,
-        Param &mute,
-        Input &levelCv,
-        float sampleRate = 1000.0f,
-        Input *muteCv = NULL
+          Param &level,
+          Param &mute,
+          Input &levelCv,
+          float sampleRate = 1000.0f,
+          Input *muteCv = NULL
     )
-        : _levelParam(level), _muteParam(mute), _levelInput(levelCv), _muteInput(muteCv) {
+          : _levelParam(level), _muteParam(mute), _levelInput(levelCv), _muteInput(muteCv) {
         setSampleRate(sampleRate);
         _rms.setSensitivity(0.05f);
     }
 
 
     void setSampleRate(float sampleRate);
+
+
     void reset();
+
+
     void next(float sample, bool solo, int c = 0, bool linearCV = false); // outputs on members out, rms.
 };
 
@@ -52,7 +56,10 @@ struct MixerChannel {
 struct LinearCVMixerModule : BGModule {
     bool _linearCV = false;
 
+
     json_t *toJson(json_t *root) override;
+
+
     void fromJson(json_t *root) override;
 };
 
@@ -65,7 +72,10 @@ struct LinearCVMixerWidget : BGModuleWidget {
 struct DimmableMixerModule : LinearCVMixerModule {
     float _dimDb = 12.0f;
 
+
     json_t *toJson(json_t *root) override;
+
+
     void fromJson(json_t *root) override;
 };
 
@@ -89,6 +99,8 @@ struct MuteButton : ToggleButton {
 
 
     void randomize() override;
+
+
     void onButton(const event::Button &e) override;
 };
 
@@ -98,10 +110,19 @@ struct SoloMuteButton : ParamWidget {
     SvgWidget *_svgWidget; // deleted elsewhere.
     CircularShadow *shadow = NULL;
 
+
     SoloMuteButton();
+
+
     void reset() override;
+
+
     void randomize() override;
+
+
     void onButton(const event::Button &e) override;
+
+
     void onChange(const event::Change &e) override;
 };
 
