@@ -2,6 +2,7 @@
 #include "analyzer_base.hpp"
 #include "dsp/signal.hpp"
 #include <vector>
+#include <filters/filter.hpp>
 
 
 ChannelAnalyzer::~ChannelAnalyzer() {
@@ -234,15 +235,15 @@ void AnalyzerCore::stepChannelSample(int channelIndex, float sample) {
     if (!_channels[channelIndex]) {
         std::lock_guard<std::mutex> lock(_channelsMutex);
         _channels[channelIndex] = new ChannelAnalyzer(
-            _size,
-            _overlap,
-            window(),
-            _sampleRate,
-            _averageN,
-            _binAverageN,
-            _outBufs + 2 * channelIndex * _outBufferN,
-            _outBufs + (2 * channelIndex + 1) * _outBufferN,
-            _currentOutBufs[channelIndex]
+              _size,
+              _overlap,
+              window(),
+              _sampleRate,
+              _averageN,
+              _binAverageN,
+              _outBufs + 2 * channelIndex * _outBufferN,
+              _outBufs + (2 * channelIndex + 1) * _outBufferN,
+              _currentOutBufs[channelIndex]
         );
     }
     _channels[channelIndex]->step(sample);
@@ -485,8 +486,10 @@ void AnalyzerDisplay::draw(const DrawArgs &args) {
 
     FrequencyPlot frequencyPlot = LOG_FP;
     AmplitudePlot amplitudePlot = DECIBELS_80_AP;
+
     float rangeMinHz = 0.0f;
     float rangeMaxHz = 0.0f;
+
     if (_module) {
         frequencyPlot = _module->_frequencyPlot;
         amplitudePlot = _module->_amplitudePlot;
@@ -525,6 +528,7 @@ void AnalyzerDisplay::draw(const DrawArgs &args) {
         int freezeBinI = 0;
         float freezeLowHz = 0.0f;
         float freezeHighHz = 0.0f;
+
         if (_freezeDraw) {
             freezeValues(rangeMinHz, rangeMaxHz, freezeBinI, freezeLowHz, freezeHighHz);
             _freezeLastBinI = freezeBinI;
@@ -547,6 +551,7 @@ void AnalyzerDisplay::draw(const DrawArgs &args) {
             drawFreezeOver(args, freezeBinI, _module->_core._size / _module->_core._binAverageN, freezeLowHz, freezeHighHz, strokeWidth);
         }
     }
+
     nvgRestore(args.vg);
 
     if (_module) {
@@ -559,7 +564,7 @@ void AnalyzerDisplay::drawBackground(const DrawArgs &args) {
     nvgSave(args.vg);
     nvgBeginPath(args.vg);
     nvgRect(args.vg, 0, 0, _size.x, _size.y);
-    nvgFillColor(args.vg, nvgRGBA(0x10, 0x20, 0x20, 0xff));
+    nvgFillColor(args.vg, nvgRGBA(0x07, 0x11, 0x11, 0xff));
     nvgFill(args.vg);
 
     if (_drawInset) {
@@ -583,10 +588,10 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
     drawText(args, s.c_str(), _insetLeft - 2, _insetTop + textY, 0, &textColor);
     x += s.size() * charPx + 10;
 
-    int spacing = 3;
+    int spacing = 30;
     if (_size.x > 300) {
         x += 5;
-        spacing = 20;
+        spacing = 30;
     }
 
     for (int i = 0; i < _module->_core._nChannels; ++i) {
@@ -595,8 +600,8 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
 
             // print as kHz if >1000
             s = peak >= 1000.f ?
-                format("%c[%7.3fkHz]", 'A' + i, peak / 1000.f) :
-                format("%c[%7.2fHz]", 'A' + i, peak);
+                format("%c:[%05.3f kHz]", 'A' + i, peak / 1000.f) :
+                format("%c:[%05.3f  Hz]", 'A' + i, peak);
 
             drawText(args, s.c_str(), x, _insetTop + textY, 0.0, &_channelColors[i % channelColorsN]);
         }
@@ -612,9 +617,8 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
     nvgStrokeColor(args.vg, nvgRGBAf(0.9f, 0.9f, 0.9f, 1.f));
     nvgStrokeWidth(args.vg, strokeWidth * 1.2f);
 
-    const int lineX = _insetLeft - 2;
+    const int lineX = _insetLeft - 3;
     const int textX = 0;
-    const float textR = -M_PI / 2.0;
     auto labelColor = nvgRGBAf(0.6f, 0.6f, 0.0f, 1.f);
 
 
@@ -634,8 +638,8 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
                 drawText(args, label, textX, y + labelOffset, 0);
             };
 
-            line(+12.0, 1.0, " 12", 02.0, _axisColor);
-            line(+00.0, 1.2, "  0", 02.0, nvgRGBAf(0.35f, 0.35f, 0.25f, 1.f));
+            line(+12.0, 1.0, "+12", 02.0, _axisColor);
+            line(+00.0, 1.2, " ±0", 02.0, nvgRGBAf(0.35f, 0.35f, 0.25f, 1.f));
             line(-12.0, 1.0, "-12", 02.0, _axisColor);
             line(-24.0, 1.0, "-24", 02.0, _axisColor);
             line(-48.0, 1.0, "-48", 02.0, _axisColor);
@@ -693,9 +697,20 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
 
 void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, FrequencyPlot plot, float rangeMinHz, float rangeMaxHz) {
     nvgSave(args.vg);
-    nvgStrokeColor(args.vg, _axisColor);
     nvgStrokeWidth(args.vg, strokeWidth);
     auto labelColor = nvgRGBAf(0.6f, 0.6f, 0.0f, 1.f);
+    auto specialColor = nvgRGBAf(0.6f, 0.6f, 1.f, 0.5f);
+    auto specialTextColor = nvgRGBAf(0.6f, 0.6f, 1.f, 0.8f);
+
+    nvgStrokeColor(args.vg, specialColor);
+    nvgStrokeWidth(args.vg, strokeWidth * 0.8);
+    drawXAxisLine(args, 440, rangeMinHz, rangeMaxHz);
+    drawXAxisLine(args, 22050, rangeMinHz, rangeMaxHz);
+    drawXAxisLine(args, 44100, rangeMinHz, rangeMaxHz);
+    drawXAxisLine(args, 88200, rangeMinHz, rangeMaxHz);
+
+    nvgStrokeColor(args.vg, _axisColor);
+    nvgStrokeWidth(args.vg, strokeWidth);
 
     switch (plot) {
         case LOG_FP: {
@@ -728,62 +743,141 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                 hz += 100000.0;
             }
 
+            // axis label
             drawText(args, "Hz", _insetLeft, _size.y - 6, 0, &labelColor);
+            auto ypos = _size.y - 5;
+
             if (rangeMinHz <= 100.0f) {
                 float x = (100.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
                 x = powf(x, _xAxisLogFactor);
                 if (x < 1.0) {
                     x *= _graphSize.x;
-                    drawText(args, "100", _insetLeft + x - 8, _size.y - 6);
+                    drawText(args, "100", _insetLeft + x - 8, ypos);
                 }
             }
+
+            if (rangeMinHz <= 440.0f) {
+                float x = (440.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
+                x = powf(x, _xAxisLogFactor);
+                if (x < 1.0) {
+                    x *= _graphSize.x;
+                    drawText(args, "440", _insetLeft + x - 8, ypos, 0, &specialTextColor, 12);
+                }
+            }
+
             if (rangeMinHz <= 1000.0f) {
                 float x = (1000.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
                 x = powf(x, _xAxisLogFactor);
                 if (x < 1.0) {
                     x *= _graphSize.x;
-                    drawText(args, "1k", _insetLeft + x - 4, _size.y - 6);
+                    drawText(args, "1k", _insetLeft + x - 4, ypos);
                 }
             }
+
+            if (rangeMinHz <= 2000.0f) {
+                float x = (2000.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
+                x = powf(x, _xAxisLogFactor);
+                if (x < 1.0) {
+                    x *= _graphSize.x;
+                    drawText(args, "2k", _insetLeft + x - 4, ypos);
+                }
+            }
+
+            if (rangeMinHz <= 5000.0f) {
+                float x = (5000.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
+                x = powf(x, _xAxisLogFactor);
+                if (x < 1.0) {
+                    x *= _graphSize.x;
+                    drawText(args, "5k", _insetLeft + x - 4, ypos);
+                }
+            }
+
             if (rangeMinHz <= 10000.0f) {
                 float x = (10000.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
                 x = powf(x, _xAxisLogFactor);
                 if (x < 1.0) {
                     x *= _graphSize.x;
-                    drawText(args, "10k", _insetLeft + x - 7, _size.y - 6);
+                    drawText(args, "10k", _insetLeft + x - 7, ypos);
                 }
             }
+
+            if (rangeMinHz <= 22050.0f) {
+                float x = (22050.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
+                x = powf(x, _xAxisLogFactor);
+                if (x < 1.0) {
+                    x *= _graphSize.x;
+                    drawText(args, "22.05k", _insetLeft + x - 7, ypos, 0, &specialTextColor, 12);
+                }
+            }
+
+            if (rangeMinHz <= 44100.0f) {
+                float x = (44100.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
+                x = powf(x, _xAxisLogFactor);
+                if (x < 1.0) {
+                    x *= _graphSize.x;
+                    drawText(args, "44.1k", _insetLeft + x - 7, ypos, 0, &specialTextColor, 12);
+                }
+            }
+
+            if (rangeMinHz <= 50000.0f) {
+                float x = (50000.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
+                x = powf(x, _xAxisLogFactor);
+                if (x < 1.0) {
+                    x *= _graphSize.x;
+                    drawText(args, "50k", _insetLeft + x - 7, ypos);
+                }
+            }
+
+            if (rangeMinHz <= 88200.0f) {
+                float x = (88200.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
+                x = powf(x, _xAxisLogFactor);
+                if (x < 1.0) {
+                    x *= _graphSize.x;
+                    drawText(args, "88.2k", _insetLeft + x - 7, ypos, 0, &specialTextColor, 12);
+                }
+            }
+
+
             if (rangeMinHz <= 100000.0f) {
                 float x = (100000.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
                 x = powf(x, _xAxisLogFactor);
                 if (x < 1.0) {
                     x *= _graphSize.x;
-                    drawText(args, "100k", _insetLeft + x - 9, _size.y - 6);
+                    drawText(args, "100k", _insetLeft + x - 9, ypos);
                 }
             }
 
-            auto extraLabels = [&](float increment) {
-                if (rangeMinHz > increment) {
-                    float hz = 2.0f * increment;
-                    float lastX = 0.0f;
-                    while (hz < 10.0f * increment) {
-                        float x = (hz - rangeMinHz) / (rangeMaxHz - rangeMinHz);
-                        x = powf(x, _xAxisLogFactor);
-                        if (x > lastX + 0.1f && x < 1.0f) {
-                            lastX = x;
-                            x *= _graphSize.x;
-                            std::string s = format("%dk", (int) (hz / 1000.0f));
-                            drawText(args, s.c_str(), _insetLeft + x - 7, _size.y - 6);
-                        }
-                        hz += increment;
-                    }
-                    return true;
-                }
-                return false;
-            };
-            extraLabels(100000.0f) ||
-            extraLabels(10000.0f) ||
-            extraLabels(1000.0f);
+            /*  auto extraLabels = [&](float increment) {
+                  if (rangeMinHz > increment) {
+                      float hz = 2.0f * increment;
+                      float lastX = 0.0f;
+                      while (hz < 10.0f * increment) {
+                          float x = (hz - rangeMinHz) / (rangeMaxHz - rangeMinHz);
+                          x = powf(x, _xAxisLogFactor);
+                          if (x > lastX + 0.1f && x < 1.0f) {
+                              lastX = x;
+                              x *= _graphSize.x;
+                              std::string s = format(" x %dk", (int) (hz / 1000.0f));
+                              drawText(args, s.c_str(), _insetLeft + x - 7, _size.y - 6);
+                          }
+                          hz += increment;
+                      }
+                      return true;
+                  }
+                  return false;
+              };
+
+              extraLabels(100000.0f) ||
+              extraLabels(50000.0f) ||
+              extraLabels(18000.0f) ||
+              extraLabels(12000.0f) ||
+              extraLabels(10000.0f) ||
+              extraLabels(5000.0f) ||
+              extraLabels(2000.0f) ||
+              extraLabels(1000.0f) ||
+              extraLabels(500.0f) ||
+              extraLabels(440.0f);*/
+
             break;
         }
 
@@ -855,14 +949,14 @@ void AnalyzerDisplay::drawXAxisLine(const DrawArgs &args, float hz, float rangeM
 
 
 void AnalyzerDisplay::drawGraph(
-    const DrawArgs &args,
-    BinsReader &bins,
-    NVGcolor color,
-    float strokeWidth,
-    FrequencyPlot freqPlot,
-    float rangeMinHz,
-    float rangeMaxHz,
-    AmplitudePlot ampPlot
+      const DrawArgs &args,
+      BinsReader &bins,
+      NVGcolor color,
+      float strokeWidth,
+      FrequencyPlot freqPlot,
+      float rangeMinHz,
+      float rangeMaxHz,
+      AmplitudePlot ampPlot
 ) {
     float nyquist = 0.5f * _module->_core._sampleRate;
     int binsN = _module->_core._size / _module->_core._binAverageN;
@@ -877,8 +971,7 @@ void AnalyzerDisplay::drawGraph(
     nvgStrokeWidth(args.vg, strokeWidth);
     nvgBeginPath(args.vg);
 
-    int height = 0;
-
+    double height = 0;
     for (int i = 0; i < pointsN; ++i) {
         int oi = pointsOffset + i;
         assert(oi < _module->_core._outBufferN);
@@ -1000,13 +1093,13 @@ void AnalyzerDisplay::drawFreezeOver(const DrawArgs &args, int binI, int binsN, 
     const float mousePad = 5.0f;
     const float edgePad = 3.0f;
     Vec boxDim(
-        maxLine * charWidth + 2 * inset,
-        lines.size() * charHeight + (lines.size() - 1) * lineSep + 2 * inset
+          maxLine * charWidth + 2 * inset,
+          lines.size() * charHeight + (lines.size() - 1) * lineSep + 2 * inset
     );
 
     Vec boxPos(
-        _freezeMouse.x + mousePad,
-        _freezeMouse.y - boxDim.y / 2.0f
+          _freezeMouse.x + mousePad,
+          _freezeMouse.y - boxDim.y / 2.0f
     );
 
     if (boxPos.x + boxDim.x > _size.x - _insetRight) {
@@ -1059,7 +1152,7 @@ void AnalyzerDisplay::drawText(const DrawArgs &args, const char *s, float x, flo
 }
 
 
-int AnalyzerDisplay::binValueToHeight(float value, AmplitudePlot plot) {
+double AnalyzerDisplay::binValueToHeight(float value, AmplitudePlot plot) {
     switch (plot) {
         case DECIBELS_80_AP:
         case DECIBELS_140_AP: {
@@ -1070,7 +1163,7 @@ int AnalyzerDisplay::binValueToHeight(float value, AmplitudePlot plot) {
             value = std::min(_positiveDisplayDB, value);
             value -= minDB;
             value /= rangeDb;
-            return roundf(_graphSize.y * value);
+            return round(_graphSize.y * value);
         }
         default:;
     }
@@ -1079,7 +1172,7 @@ int AnalyzerDisplay::binValueToHeight(float value, AmplitudePlot plot) {
     value = binValueToAmplitude(value);
     value = std::min(value, 2.0f);
     value = std::max(value, 0.0f);
-    return roundf(_graphSize.y * value / _totalLinearAmplitude);
+    return round(_graphSize.y * value / _totalLinearAmplitude);
 }
 
 
