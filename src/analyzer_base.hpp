@@ -36,19 +36,19 @@ struct ChannelAnalyzer {
 
 
     ChannelAnalyzer(
-          SpectrumAnalyzer::Size size,
-          SpectrumAnalyzer::Overlap overlap,
-          SpectrumAnalyzer::WindowType windowType,
-          float sampleRate,
-          int averageN,
-          int binSize,
-          float *outBuf1,
-          float *outBuf2,
-          std::atomic<float *> &currentOutBuf
+        SpectrumAnalyzer::Size size,
+        SpectrumAnalyzer::Overlap overlap,
+        SpectrumAnalyzer::WindowType windowType,
+        float sampleRate,
+        int averageN,
+        int binSize,
+        float *outBuf1,
+        float *outBuf2,
+        std::atomic<float *> &currentOutBuf
     )
-          : _analyzer(size, overlap, windowType, sampleRate, false), _binsN(size / binSize), _bins0(outBuf1), _bins1(outBuf2), _currentBins(_bins0), _currentOutBuf(currentOutBuf),
-            _averagedBins(averageN == 1 ? NULL : new AveragingBuffer<float>(_binsN, averageN)), _stepBufN(size / overlap), _stepBuf(new float[_stepBufN]{}), _workerBufN(size + 1),
-            _workerBuf(new float[_workerBufN]{}), _worker(&ChannelAnalyzer::work, this) {
+        : _analyzer(size, overlap, windowType, sampleRate, false), _binsN(size / binSize), _bins0(outBuf1), _bins1(outBuf2), _currentBins(_bins0), _currentOutBuf(currentOutBuf),
+          _averagedBins(averageN == 1 ? NULL : new AveragingBuffer<float>(_binsN, averageN)), _stepBufN(size / overlap), _stepBuf(new float[_stepBufN]{}), _workerBufN(size + 1),
+          _workerBuf(new float[_workerBufN]{}), _worker(&ChannelAnalyzer::work, this) {
         assert(averageN >= 1);
         assert(binSize >= 1);
     }
@@ -97,8 +97,8 @@ struct AnalyzerCore {
 
 
     AnalyzerCore(int nChannels, SpectrumAnalyzer::Overlap overlap = SpectrumAnalyzer::OVERLAP_2)
-          : _nChannels(nChannels), _channels(new ChannelAnalyzer *[_nChannels]{}), _outBufs(new float[2 * nChannels * _outBufferN]{}), _currentOutBufs(new std::atomic<float *>[nChannels]),
-            _overlap(overlap) {
+        : _nChannels(nChannels), _channels(new ChannelAnalyzer *[_nChannels]{}), _outBufs(new float[2 * nChannels * _outBufferN]{}), _currentOutBufs(new std::atomic<float *>[nChannels]),
+          _overlap(overlap) {
         for (int i = 0; i < nChannels; ++i) {
             _currentOutBufs[i] = _outBufs + 2 * i * _outBufferN;
         }
@@ -168,14 +168,14 @@ struct AnalyzerBase : BGModule, AnalyzerTypes {
 
 
     AnalyzerBase(
-          int nChannels,
-          int np,
-          int ni,
-          int no,
-          int nl = 0,
-          SpectrumAnalyzer::Overlap overlap = SpectrumAnalyzer::OVERLAP_2
+        int nChannels,
+        int np,
+        int ni,
+        int no,
+        int nl = 0,
+        SpectrumAnalyzer::Overlap overlap = SpectrumAnalyzer::OVERLAP_2
     )
-          : _core(nChannels, overlap) {
+        : _core(nChannels, overlap) {
         config(np, ni, no, nl);
     }
 
@@ -249,13 +249,14 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
 
     const NVGcolor _axisColor = nvgRGBAf(0.2f, 0.2f, 0.2f, 1.f);
     const NVGcolor _textColor = nvgRGBAf(0.8f, 0.8f, 0.8f, 1);
+    const NVGcolor _highlightAxisColor = nvgRGBAf(0.45f, 0.35f, 0.35f, 1);
 
     static constexpr int channelColorsN = 4;
     NVGcolor _channelColors[channelColorsN] = {
-          nvgRGBA(0x00, 0xff, 0x00, 0xd0),
-          nvgRGBA(0xff, 0x00, 0xff, 0xd0),
-          nvgRGBA(0xff, 0x80, 0x00, 0xd0),
-          nvgRGBA(0x00, 0x80, 0xff, 0xd0)
+        nvgRGBA(0x00, 0xff, 0x00, 0xd0),
+        nvgRGBA(0xff, 0x00, 0xff, 0xd0),
+        nvgRGBA(0xff, 0x80, 0x00, 0xd0),
+        nvgRGBA(0x00, 0x80, 0xff, 0xd0)
     };
 
     AnalyzerBase *_module;
@@ -275,12 +276,12 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
 
 
     AnalyzerDisplay(
-          AnalyzerBase *module,
-          Vec size,
-          bool drawInset
+        AnalyzerBase *module,
+        Vec size,
+        bool drawInset
     )
-          : _module(module), _size(size), _graphSize(_size.x - _insetLeft - _insetRight, _size.y - _insetTop - _insetBottom), _drawInset(drawInset),
-            _font(APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/VeraMoBd.ttf"))) {
+        : _module(module), _size(size), _graphSize(_size.x - _insetLeft - _insetRight, _size.y - _insetTop - _insetBottom), _drawInset(drawInset),
+          _font(APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/VeraMoBd.ttf"))) {
         if (_module) {
             _channelBinsReaderFactories = new BinsReaderFactory[_module->_core._nChannels]{};
             _displayChannel = new bool[_module->_core._nChannels]{};
@@ -323,7 +324,7 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
     void draw(const DrawArgs &args) override;
 
 
-    void drawBackground(const DrawArgs &args);
+    void drawBackground(const DrawArgs &args) const;
 
 
     virtual void drawHeader(const DrawArgs &args, float rangeMinHz, float rangeMaxHz);
