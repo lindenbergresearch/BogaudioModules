@@ -128,13 +128,13 @@ struct AnalyzerCore {
     SpectrumAnalyzer::WindowType window();
 
 
-    inline float *getBins(int i) {
+    inline float *getBins(int i) const {
         assert(i >= 0 && i < _nChannels);
         return _currentOutBufs[i];
     }
 
 
-    float getPeak(int channel, float minHz, float maxHz);
+    float getPeak(int channel, float minHz, float maxHz) const;
 
 
     void stepChannel(int channelIndex, Input &input);
@@ -180,7 +180,7 @@ struct AnalyzerBase : BGModule, AnalyzerTypes {
     }
 
 
-    void frequencyPlotToJson(json_t *root);
+    void frequencyPlotToJson(json_t *root) const;
 
 
     void frequencyPlotFromJson(json_t *root);
@@ -212,10 +212,10 @@ struct AnalyzerBaseWidget : BGModuleWidget {
 
 struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
     struct BinsReader {
-        BinsReader() {}
+        BinsReader() = default;
 
 
-        virtual ~BinsReader() {}
+        virtual ~BinsReader() = default;
 
 
         virtual float at(int i) = 0;
@@ -241,22 +241,24 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
     const int _insetTop = _insetAround + 20;
     const int _insetBottom = _insetAround + 16;
 
-    // const float _displayDB = 140.0;
+
+
+    const float _displayDB = 140.0;
     const float _positiveDisplayDB = 20.0;
-    const float _totalLinearAmplitude = 2.0;
+    const float _totalLinearAmplitude = 1.2;
 
     const float baseXAxisLogFactor = 1 / 3.321; // magic number.
 
     const NVGcolor _axisColor = nvgRGBAf(0.2f, 0.2f, 0.2f, 1.f);
-    const NVGcolor _textColor = nvgRGBAf(0.8f, 0.8f, 0.8f, 1);
-    const NVGcolor _highlightAxisColor = nvgRGBAf(0.45f, 0.35f, 0.35f, 1);
+    const NVGcolor _textColor = nvgRGBAf(0.99f, 0.99f, 0.99f, 1);
+    const NVGcolor _highlightAxisColor = nvgRGBAf(0.45f, 0.35f, 0.35f, 0.8);
 
     static constexpr int channelColorsN = 4;
     NVGcolor _channelColors[channelColorsN] = {
-        nvgRGBA(0x00, 0xff, 0x00, 0xd0),
-        nvgRGBA(0xff, 0x00, 0xff, 0xd0),
-        nvgRGBA(0xff, 0x80, 0x00, 0xd0),
-        nvgRGBA(0x00, 0x80, 0xff, 0xd0)
+        nvgRGBAf(0, 0.6, 1, 0.9),
+        nvgRGBAf(1, 0.2, 0, 0.9),
+        nvgRGBAf(0, 0.1, 1, 0.9),
+        nvgRGBAf(1, 1, 0.1, 0.9)
     };
 
     AnalyzerBase *_module;
@@ -265,21 +267,17 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
     bool _drawInset;
     std::shared_ptr<Font> _font;
     float _xAxisLogFactor = baseXAxisLogFactor;
-    BinsReaderFactory *_channelBinsReaderFactories = NULL;
-    bool *_displayChannel = NULL;
-    std::string *_channelLabels = NULL;
+    BinsReaderFactory *_channelBinsReaderFactories = nullptr;
+    bool *_displayChannel = nullptr;
+    std::string *_channelLabels = nullptr;
     Vec _freezeMouse;
     bool _freezeDraw = false;
-    float *_freezeBufs = NULL;
+    float *_freezeBufs = nullptr;
     int _freezeNudgeBin = 0;
     int _freezeLastBinI = -1;
 
 
-    AnalyzerDisplay(
-        AnalyzerBase *module,
-        Vec size,
-        bool drawInset
-    )
+    AnalyzerDisplay(AnalyzerBase *module, Vec size, bool drawInset)
         : _module(module), _size(size), _graphSize(_size.x - _insetLeft - _insetRight, _size.y - _insetTop - _insetBottom), _drawInset(drawInset),
           _font(APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/VeraMoBd.ttf"))) {
         if (_module) {

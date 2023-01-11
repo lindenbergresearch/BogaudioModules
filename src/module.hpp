@@ -60,13 +60,6 @@ struct BGModule : Module {
 
     virtual void sampleRateChange() {}
 
-
-    virtual json_t *toJson(json_t *root) { return root; }
-
-
-    virtual void fromJson(json_t *root) {}
-
-
     virtual bool active() { return true; }
 
 

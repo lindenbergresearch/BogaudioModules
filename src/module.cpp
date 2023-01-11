@@ -21,11 +21,12 @@ void BGModule::onSampleRateChange() {
 
 
 json_t *BGModule::dataToJson() {
-    json_t *root = json_object();
+    json_t *root = Module::dataToJson();
     if (_skinnable && _skin != "default") {
         json_object_set_new(root, SKIN, json_string(_skin.c_str()));
     }
-    return toJson(root);
+
+    return root;
 }
 
 
@@ -39,7 +40,7 @@ void BGModule::dataFromJson(json_t *root) {
         }
     }
 
-    fromJson(root);
+    Module::dataFromJson(root);
 }
 
 
@@ -94,7 +95,7 @@ void BGModule::process(const ProcessArgs &args) {
 void BGModule::setSkin(std::string skin) {
     if (skin == "default" || Skins::skins().validKey(skin)) {
         _skin = skin;
-        for (auto scl : _skinChangeListeners) {
+        for (auto scl: _skinChangeListeners) {
             scl->skinChanged(skin);
         }
     }
@@ -165,25 +166,25 @@ void BGModuleWidget::appendContextMenu(Menu *menu) {
             OptionsMenuItem *s = new OptionsMenuItem("Panel");
 
             s->addItem(OptionMenuItem("Default", [m]() { return m->_skin == "default"; }, [m]() { m->setSkin("default"); }));
-            for (auto skin : skins->available()) {
+            for (auto skin: skins->available()) {
                 std::string key = skin.key;
                 s->addItem(
-                      OptionMenuItem(
-                            skin.display.c_str(),
-                            [m, key]() { return m->_skin == key; },
-                            [m, key]() { m->setSkin(key); }
-                      ));
+                    OptionMenuItem(
+                        skin.display.c_str(),
+                        [m, key]() { return m->_skin == key; },
+                        [m, key]() { m->setSkin(key); }
+                    ));
             }
 
             s->addSpacer();
-            for (auto skin : skins->available()) {
+            for (auto skin: skins->available()) {
                 std::string key = skin.key;
                 s->addItem(
-                      OptionMenuItem(
-                            (std::string("Default to ") + skin.display).c_str(),
-                            [key, skins]() { return skins->defaultKey() == key; },
-                            [key, skins]() { skins->setDefaultSkin(key); }
-                      ));
+                    OptionMenuItem(
+                        (std::string("Default to ") + skin.display).c_str(),
+                        [key, skins]() { return skins->defaultKey() == key; },
+                        [key, skins]() { skins->setDefaultSkin(key); }
+                    ));
             }
 
             OptionsMenuItem::addToMenu(s, menu);

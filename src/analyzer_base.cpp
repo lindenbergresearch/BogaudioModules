@@ -127,7 +127,7 @@ void AnalyzerCore::resetChannelsLocked() {
     for (int i = 0; i < _nChannels; ++i) {
         if (_channels[i]) {
             delete _channels[i];
-            _channels[i] = NULL;
+            _channels[i] = nullptr;
         }
     }
 }
@@ -193,7 +193,7 @@ SpectrumAnalyzer::WindowType AnalyzerCore::window() {
 }
 
 
-float AnalyzerCore::getPeak(int channel, float minHz, float maxHz) {
+float AnalyzerCore::getPeak(int channel, float minHz, float maxHz) const {
     assert(channel >= 0 && channel < _nChannels);
     const float *bins = getBins(channel);
     const int bandsPerBin = _size / _binsN;
@@ -235,15 +235,15 @@ void AnalyzerCore::stepChannelSample(int channelIndex, float sample) {
     if (!_channels[channelIndex]) {
         std::lock_guard<std::mutex> lock(_channelsMutex);
         _channels[channelIndex] = new ChannelAnalyzer(
-              _size,
-              _overlap,
-              window(),
-              _sampleRate,
-              _averageN,
-              _binAverageN,
-              _outBufs + 2 * channelIndex * _outBufferN,
-              _outBufs + (2 * channelIndex + 1) * _outBufferN,
-              _currentOutBufs[channelIndex]
+            _size,
+            _overlap,
+            window(),
+            _sampleRate,
+            _averageN,
+            _binAverageN,
+            _outBufs + 2 * channelIndex * _outBufferN,
+            _outBufs + (2 * channelIndex + 1) * _outBufferN,
+            _currentOutBufs[channelIndex]
         );
     }
     _channels[channelIndex]->step(sample);
@@ -255,7 +255,7 @@ void AnalyzerCore::stepChannelSample(int channelIndex, float sample) {
 #define FREQUENCY_PLOT_LINEAR_KEY "linear"
 
 
-void AnalyzerBase::frequencyPlotToJson(json_t *root) {
+void AnalyzerBase::frequencyPlotToJson(json_t *root) const {
     switch (_frequencyPlot) {
         case LOG_FP: {
             json_object_set_new(root, FREQUENCY_PLOT_KEY, json_string(FREQUENCY_PLOT_LOG_KEY));
@@ -293,7 +293,7 @@ void AnalyzerBase::frequencyRangeToJson(json_t *root) {
 void AnalyzerBase::frequencyRangeFromJson(json_t *root) {
     json_t *jr = json_object_get(root, RANGE_KEY);
     if (jr) {
-        _range = clamp(json_real_value(jr), -0.9f, 0.8f);
+        _range = json_real_value(jr);
     }
 }
 
@@ -327,6 +327,7 @@ void AnalyzerBase::amplitudePlotFromJson(json_t *root) {
     json_t *ap = json_object_get(root, AMPLITUDE_PLOT_KEY);
     if (ap) {
         std::string aps = json_string_value(ap);
+        DEBUG("amplitude: %s", aps.c_str());
         if (aps == AMPLITUDE_PLOT_DECIBLES_80_KEY) {
             _amplitudePlot = DECIBELS_80_AP;
         } else if (aps == AMPLITUDE_PLOT_DECIBLES_140_KEY) {
@@ -337,7 +338,7 @@ void AnalyzerBase::amplitudePlotFromJson(json_t *root) {
     } else { // backwards compatibility...
         json_t *jrd = json_object_get(root, RANGE_DB_KEY);
         if (jrd) {
-            if ((float) json_real_value(jrd) == 140.0f) {
+            if ((float) json_real_value(jrd) == 140.f) {
                 _amplitudePlot = DECIBELS_140_AP;
             }
         }
@@ -349,7 +350,7 @@ void AnalyzerBaseWidget::addFrequencyPlotContextMenu(Menu *menu) {
     auto m = dynamic_cast<AnalyzerBase *>(module);
     assert(m);
 
-    OptionsMenuItem *mi = new OptionsMenuItem("Frequency plot");
+    OptionsMenuItem *mi = new OptionsMenuItem("Frequency Plot");
     mi->addItem(OptionMenuItem("Logarithmic", [m]() { return m->_frequencyPlot == AnalyzerBase::LOG_FP; }, [m]() { m->_frequencyPlot = AnalyzerBase::LOG_FP; }));
     mi->addItem(OptionMenuItem("Linear", [m]() { return m->_frequencyPlot == AnalyzerBase::LINEAR_FP; }, [m]() { m->_frequencyPlot = AnalyzerBase::LINEAR_FP; }));
     OptionsMenuItem::addToMenu(mi, menu);
@@ -360,7 +361,7 @@ void AnalyzerBaseWidget::addFrequencyRangeContextMenu(Menu *menu) {
     auto m = dynamic_cast<AnalyzerBase *>(module);
     assert(m);
 
-    OptionsMenuItem *mi = new OptionsMenuItem("Frequency range");
+    OptionsMenuItem *mi = new OptionsMenuItem("Frequency Range");
     mi->addItem(OptionMenuItem("Lower 10%", [m]() { return m->_range == -0.9f; }, [m]() { m->_range = -0.9f; }));
     mi->addItem(OptionMenuItem("Lower 25%", [m]() { return m->_range == -0.75f; }, [m]() { m->_range = -0.75f; }));
     mi->addItem(OptionMenuItem("Lower 50%", [m]() { return m->_range == -0.5f; }, [m]() { m->_range = -0.5f; }));
@@ -377,11 +378,11 @@ void AnalyzerBaseWidget::addAmplitudePlotContextMenu(Menu *menu, bool linearOpti
     auto m = dynamic_cast<AnalyzerBase *>(module);
     assert(m);
 
-    OptionsMenuItem *mi = new OptionsMenuItem("Amplitude plot");
-    mi->addItem(OptionMenuItem("Decibels to -60dB", [m]() { return m->_amplitudePlot == AnalyzerBase::DECIBELS_80_AP; }, [m]() { m->_amplitudePlot = AnalyzerBase::DECIBELS_80_AP; }));
-    mi->addItem(OptionMenuItem("Decibels To -120dB", [m]() { return m->_amplitudePlot == AnalyzerBase::DECIBELS_140_AP; }, [m]() { m->_amplitudePlot = AnalyzerBase::DECIBELS_140_AP; }));
+    OptionsMenuItem *mi = new OptionsMenuItem("Amplitude Plot");
+    mi->addItem(OptionMenuItem("Decibels - 80dB", [m]() { return m->_amplitudePlot == AnalyzerBase::DECIBELS_80_AP; }, [m]() { m->_amplitudePlot = AnalyzerBase::DECIBELS_80_AP; }));
+    mi->addItem(OptionMenuItem("Decibels -140dB", [m]() { return m->_amplitudePlot == AnalyzerBase::DECIBELS_140_AP; }, [m]() { m->_amplitudePlot = AnalyzerBase::DECIBELS_140_AP; }));
     if (linearOption) {
-        mi->addItem(OptionMenuItem("Linear percentage", [m]() { return m->_amplitudePlot == AnalyzerBase::PERCENTAGE_AP; }, [m]() { m->_amplitudePlot = AnalyzerBase::PERCENTAGE_AP; }));
+        mi->addItem(OptionMenuItem("Linear %", [m]() { return m->_amplitudePlot == AnalyzerBase::PERCENTAGE_AP; }, [m]() { m->_amplitudePlot = AnalyzerBase::PERCENTAGE_AP; }));
     }
     OptionsMenuItem::addToMenu(mi, menu);
 }
@@ -560,9 +561,11 @@ void AnalyzerDisplay::draw(const DrawArgs &args) {
 }
 
 
-void AnalyzerDisplay::drawBackground(const DrawArgs &args) {
+void AnalyzerDisplay::drawBackground(const DrawArgs &args) const {
     nvgSave(args.vg);
+
     nvgBeginPath(args.vg);
+    nvgScissor(args.vg, 0, 0, _size.x, _size.y);
     nvgRect(args.vg, 0, 0, _size.x, _size.y);
     nvgFillColor(args.vg, nvgRGBA(0x07, 0x11, 0x11, 0xff));
     nvgFill(args.vg);
@@ -588,10 +591,10 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
     drawText(args, s.c_str(), _insetLeft - 2, _insetTop + textY, 0, &textColor);
     x += s.size() * charPx + 10;
 
-    int spacing = 30;
+    int spacing = 40;
     if (_size.x > 300) {
         x += 5;
-        spacing = 30;
+        spacing = 40;
     }
 
     for (int i = 0; i < _module->_core._nChannels; ++i) {
@@ -600,8 +603,8 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
 
             // print as kHz if >1000
             s = peak >= 1000.f ?
-                format("%c:[%05.3f kHz]", 'A' + i, peak / 1000.f) :
-                format("%c:[%05.3f  Hz]", 'A' + i, peak);
+                format("%c:[%5.3f kHz]", 'A' + i, peak / 1000.f) :
+                format("%c:[%5.3f  Hz]", 'A' + i, peak);
 
             drawText(args, s.c_str(), x, _insetTop + textY, 0.0, &_channelColors[i % channelColorsN]);
         }
@@ -614,18 +617,18 @@ void AnalyzerDisplay::drawHeader(const DrawArgs &args, float rangeMinHz, float r
 
 void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, AmplitudePlot plot) {
     nvgSave(args.vg);
-    nvgStrokeColor(args.vg, nvgRGBAf(0.9f, 0.9f, 0.9f, 1.f));
+    nvgStrokeColor(args.vg, nvgRGBAf(0.9f, 0.9f, 0.9f, 0.6f));
     nvgStrokeWidth(args.vg, strokeWidth * 1.2f);
 
     const int lineX = _insetLeft - 3;
     const int textX = 0;
-    auto labelColor = nvgRGBAf(0.6f, 0.6f, 0.0f, 1.f);
+    auto labelColor = nvgRGBAf(0.9f, 0.5f, 0.5f, 1.f);
 
 
     switch (plot) {
         case DECIBELS_80_AP:
         case DECIBELS_140_AP: {
-            float rangeDb = plot == DECIBELS_140_AP ? 140.0 : 80.0;
+            float rangeDb = plot == DECIBELS_140_AP ? _displayDB : _displayDB * 0.5f;
 
             auto line = [&](float db, float sw, const char *label, float labelOffset, const NVGcolor &color) {
                 nvgBeginPath(args.vg);
@@ -639,12 +642,13 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
             };
 
             line(+12.0, 1.0, "+12", 02.0, _axisColor);
-            line(+00.0, 1.2, " ±0", 02.0, nvgRGBAf(0.35f, 0.35f, 0.25f, 1.f));
+            line(+00.0, 1.2, " ±0", 02.0, _highlightAxisColor);
             line(-12.0, 1.0, "-12", 02.0, _axisColor);
             line(-24.0, 1.0, "-24", 02.0, _axisColor);
             line(-48.0, 1.0, "-48", 02.0, _axisColor);
 
             if (rangeDb > 100.0) {
+                line(-60.0, 1.0, "-60", 2.0, _highlightAxisColor);
                 line(-96.0, 1.0, "-96", 2.0, _axisColor);
             }
 
@@ -668,11 +672,13 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
             line(160.0, 1.0, "160", 2.0, _axisColor);
             line(140.0, 1.0, "140", 2.0, _axisColor);
             line(120.0, 1.0, "120", 2.0, _axisColor);
-            line(100.0, 1.5, "100", 2.0, nvgRGBAf(0.3f, 0.4f, 0.0f, 1.f));
+            line(100.0, 1.5, "100", 2.0, _highlightAxisColor);
             line(080.0, 1.0, " 80", 2.0, _axisColor);
             line(060.0, 1.0, " 60", 2.0, _axisColor);
             line(040.0, 1.0, " 40", 2.0, _axisColor);
             line(020.0, 1.0, " 20", 2.0, _axisColor);
+            line(010.0, 1.0, " 10", 2.0, _axisColor);
+            line(005.0, 1.0, "  5", 2.0, _axisColor);
 
 
             drawText(args, "  %", textX, _size.y - _insetBottom, 0, &labelColor);
@@ -682,7 +688,7 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
 
     nvgBeginPath(args.vg);
     int lineY = _insetTop;
-    nvgStrokeColor(args.vg, nvgRGBAf(0.5f, 0.5f, 0.5f, 1.f));
+    nvgStrokeColor(args.vg, nvgRGBAf(0.4f, 0.4f, 0.4f, 1.f));
     nvgStrokeWidth(args.vg, strokeWidth * 1.2);
     nvgMoveTo(args.vg, lineX, lineY);
     nvgLineTo(args.vg, _size.x - _insetRight, lineY);
@@ -698,13 +704,13 @@ void AnalyzerDisplay::drawYAxis(const DrawArgs &args, float strokeWidth, Amplitu
 void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, FrequencyPlot plot, float rangeMinHz, float rangeMaxHz) {
     nvgSave(args.vg);
     nvgStrokeWidth(args.vg, strokeWidth);
-    auto labelColor = nvgRGBAf(0.6f, 0.6f, 0.0f, 1.f);
-    auto specialColor = nvgRGBAf(0.6f, 0.6f, 1.f, 0.5f);
-    auto specialTextColor = nvgRGBAf(0.6f, 0.6f, 1.f, 0.8f);
+    auto labelColor = nvgRGBAf(0.9f, 0.5f, 0.5f, 1.f);
+    auto specialColor = nvgRGBA(0x68, 0xBE, 0xF3, 90);
+    auto specialTextColor = nvgRGB(0x68, 0xBE, 0xF3);
 
     nvgStrokeColor(args.vg, specialColor);
-    nvgStrokeWidth(args.vg, strokeWidth * 0.8);
-    drawXAxisLine(args, 440, rangeMinHz, rangeMaxHz);
+    nvgStrokeWidth(args.vg, strokeWidth * 1.3f);
+    drawXAxisLine(args, 20, rangeMinHz, rangeMaxHz);
     drawXAxisLine(args, 22050, rangeMinHz, rangeMaxHz);
     drawXAxisLine(args, 44100, rangeMinHz, rangeMaxHz);
     drawXAxisLine(args, 88200, rangeMinHz, rangeMaxHz);
@@ -765,6 +771,15 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                 }
             }
 
+            if (rangeMinHz <= 20.0f) {
+                float x = (20.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
+                x = powf(x, _xAxisLogFactor);
+                if (x < 1.0) {
+                    x *= _graphSize.x;
+                    drawText(args, "20", _insetLeft + x - 6, ypos, 0, &specialTextColor, 12);
+                }
+            }
+
             if (rangeMinHz <= 1000.0f) {
                 float x = (1000.0 - rangeMinHz) / (rangeMaxHz - rangeMinHz);
                 x = powf(x, _xAxisLogFactor);
@@ -806,7 +821,7 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                 x = powf(x, _xAxisLogFactor);
                 if (x < 1.0) {
                     x *= _graphSize.x;
-                    drawText(args, "22.05k", _insetLeft + x - 7, ypos, 0, &specialTextColor, 12);
+                    drawText(args, "22.05k", _insetLeft + x - 12, ypos, 0, &specialTextColor, 12);
                 }
             }
 
@@ -815,7 +830,7 @@ void AnalyzerDisplay::drawXAxis(const DrawArgs &args, float strokeWidth, Frequen
                 x = powf(x, _xAxisLogFactor);
                 if (x < 1.0) {
                     x *= _graphSize.x;
-                    drawText(args, "44.1k", _insetLeft + x - 7, ypos, 0, &specialTextColor, 12);
+                    drawText(args, "44.1k", _insetLeft + x - 17, ypos, 0, &specialTextColor, 12);
                 }
             }
 
@@ -949,14 +964,14 @@ void AnalyzerDisplay::drawXAxisLine(const DrawArgs &args, float hz, float rangeM
 
 
 void AnalyzerDisplay::drawGraph(
-      const DrawArgs &args,
-      BinsReader &bins,
-      NVGcolor color,
-      float strokeWidth,
-      FrequencyPlot freqPlot,
-      float rangeMinHz,
-      float rangeMaxHz,
-      AmplitudePlot ampPlot
+    const DrawArgs &args,
+    BinsReader &bins,
+    NVGcolor color,
+    float strokeWidth,
+    FrequencyPlot freqPlot,
+    float rangeMinHz,
+    float rangeMaxHz,
+    AmplitudePlot ampPlot
 ) {
     float nyquist = 0.5f * _module->_core._sampleRate;
     int binsN = _module->_core._size / _module->_core._binAverageN;
@@ -968,10 +983,12 @@ void AnalyzerDisplay::drawGraph(
     nvgSave(args.vg);
     nvgScissor(args.vg, _insetLeft, _insetTop, _graphSize.x, _graphSize.y);
     nvgStrokeColor(args.vg, color);
+    nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
     nvgStrokeWidth(args.vg, strokeWidth);
     nvgBeginPath(args.vg);
 
     double height = 0;
+
     for (int i = 0; i < pointsN; ++i) {
         int oi = pointsOffset + i;
         assert(oi < _module->_core._outBufferN);
@@ -1034,7 +1051,7 @@ void AnalyzerDisplay::drawFreezeOver(const DrawArgs &args, int binI, int binsN, 
         if (hz < 1000.0f) {
             return format("%0.2f Hz", hz);
         }
-        return format("%0.3f KHz", hz / 1000.0f);
+        return format("%0.3f kHz", hz / 1000.0f);
     };
 
     std::vector<std::string> labels;
@@ -1066,7 +1083,7 @@ void AnalyzerDisplay::drawFreezeOver(const DrawArgs &args, int binI, int binsN, 
     assert(labels.size() == values.size());
 
     size_t maxLabel = 0;
-    for (auto &label : labels) {
+    for (auto &label: labels) {
         if (label.size() > maxLabel) {
             maxLabel = label.size();
         }
@@ -1093,13 +1110,13 @@ void AnalyzerDisplay::drawFreezeOver(const DrawArgs &args, int binI, int binsN, 
     const float mousePad = 5.0f;
     const float edgePad = 3.0f;
     Vec boxDim(
-          maxLine * charWidth + 2 * inset,
-          lines.size() * charHeight + (lines.size() - 1) * lineSep + 2 * inset
+        maxLine * charWidth + 2 * inset,
+        lines.size() * charHeight + (lines.size() - 1) * lineSep + 2 * inset
     );
 
     Vec boxPos(
-          _freezeMouse.x + mousePad,
-          _freezeMouse.y - boxDim.y / 2.0f
+        _freezeMouse.x + mousePad,
+        _freezeMouse.y - boxDim.y / 2.0f
     );
 
     if (boxPos.x + boxDim.x > _size.x - _insetRight) {
@@ -1142,12 +1159,12 @@ void AnalyzerDisplay::drawFreezeOver(const DrawArgs &args, int binI, int binsN, 
 
 void AnalyzerDisplay::drawText(const DrawArgs &args, const char *s, float x, float y, float rotation, const NVGcolor *color, int fontSize) {
     nvgSave(args.vg);
-    nvgTranslate(args.vg, x, y);
+    nvgTranslate(args.vg, ceil(x), ceil(y));
     nvgRotate(args.vg, rotation);
     nvgFontSize(args.vg, fontSize);
     nvgFontFaceId(args.vg, _font->handle);
     nvgFillColor(args.vg, color ? *color : _textColor);
-    nvgText(args.vg, 0, 0, s, NULL);
+    nvgText(args.vg, 0, 0, s, nullptr);
     nvgRestore(args.vg);
 }
 
@@ -1156,7 +1173,7 @@ double AnalyzerDisplay::binValueToHeight(float value, AmplitudePlot plot) {
     switch (plot) {
         case DECIBELS_80_AP:
         case DECIBELS_140_AP: {
-            float rangeDb = plot == DECIBELS_140_AP ? 140.0 : 80.0;
+            float rangeDb = plot == DECIBELS_140_AP ? _displayDB : _displayDB * 0.5f;
             const float minDB = -(rangeDb - _positiveDisplayDB);
             value = binValueToDb(value);
             value = std::max(minDB, value);
@@ -1170,7 +1187,7 @@ double AnalyzerDisplay::binValueToHeight(float value, AmplitudePlot plot) {
 
     //case PERCENTAGE_AP:
     value = binValueToAmplitude(value);
-    value = std::min(value, 2.0f);
+    value = std::min(value, 1.2f);
     value = std::max(value, 0.0f);
     return round(_graphSize.y * value / _totalLinearAmplitude);
 }
