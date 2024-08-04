@@ -19,11 +19,7 @@ struct ComplexBiquadFilter : BiquadFilter<float> {
 
 
     void setComplexParams(
-          float gain,
-          float zeroRadius,
-          float zeroTheta,
-          float poleRadius,
-          float poleTheta
+        float gain, float zeroRadius, float zeroTheta, float poleRadius, float poleTheta
     );
 
 
@@ -33,8 +29,7 @@ struct ComplexBiquadFilter : BiquadFilter<float> {
 
 struct MultipoleFilter : Filter {
     enum Type {
-        LP_TYPE,
-        HP_TYPE
+        LP_TYPE, HP_TYPE
     };
 
     static constexpr int maxPoles = 20;
@@ -51,11 +46,7 @@ struct MultipoleFilter : Filter {
 
 
     void setParams(
-          Type type,
-          int poles,
-          float sampleRate,
-          float cutoff,
-          float ripple // FIXME: using this with more than two poles creates large gain, need compensation.
+        Type type, int poles, float sampleRate, float cutoff, float ripple // FIXME: using this with more than two poles creates large gain, need compensation.
     );
 
 

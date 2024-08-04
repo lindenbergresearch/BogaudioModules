@@ -1,4 +1,3 @@
-
 #include "ffft/FFTRealFixLen.h"
 
 #include "buffer.hpp"
@@ -14,20 +13,19 @@ void Window::apply(float *in, float *out) {
 }
 
 
-HanningWindow::HanningWindow(int size, float alpha) : Window(size) {
+HanningWindow::HanningWindow(int size, float alpha) :
+    Window(size) {
     const float invAlpha = 1.f - alpha;
     const float twoPIEtc = 2.f * float(M_PI) / float(size);
 
     for (int i = 0; i < _size; ++i) {
-        _sum += _window[i] =
-              invAlpha *
-              cosf(twoPIEtc * float(i) + float(M_PI)) +
-              alpha;
+        _sum += _window[i] = invAlpha * cosf(twoPIEtc * float(i) + float(M_PI)) + alpha;
     }
 }
 
 
-KaiserWindow::KaiserWindow(int size, float alpha) : Window(size) {
+KaiserWindow::KaiserWindow(int size, float alpha) :
+    Window(size) {
     float ii0a = 1.0f / i0(alpha);
     float ism1 = 1.0f / (float) (size - 1);
 
@@ -67,7 +65,8 @@ float KaiserWindow::i0(float x) {
 }
 
 
-PlanckTaperWindow::PlanckTaperWindow(int size, int taperSamples) : Window(size) {
+PlanckTaperWindow::PlanckTaperWindow(int size, int taperSamples) :
+    Window(size) {
     _window[0] = 0.0f;
     _sum += _window[size - 1] = 1.0f;
 
@@ -179,16 +178,11 @@ void FFT32768::do_fft(float *out, float *in) {
 
 
 SpectrumAnalyzer::SpectrumAnalyzer(
-      Size size,
-      Overlap overlap,
-      WindowType windowType,
-      float sampleRate,
-      bool autoProcess
-) : OverlappingBuffer(
-      size,
-      overlap,
-      autoProcess
-), _sampleRate(sampleRate) {
+    Size size, Overlap overlap, WindowType windowType, float sampleRate, bool autoProcess
+) :
+    OverlappingBuffer(
+        size, overlap, autoProcess
+    ), _sampleRate(sampleRate) {
     assert(size <= maxSize);
     assert(_sampleRate > int(size));
 
@@ -310,11 +304,7 @@ void SpectrumAnalyzer::getMagnitudes(float *bins, int nBins) {
         int binEnd = bin * binWidth + binWidth;
 
         for (int i = binEnd - binWidth; i < binEnd; ++i) {
-            sum += (_fftOut[i] *
-                    _fftOut[i] +
-                    _fftOut[i + bands] *
-                    _fftOut[i + bands]
-                   ) * normalization;
+            sum += (_fftOut[i] * _fftOut[i] + _fftOut[i + bands] * _fftOut[i + bands]) * normalization;
         }
 
         bins[bin] = sum * invBinWidth;

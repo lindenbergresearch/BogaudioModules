@@ -1,4 +1,3 @@
-
 #include <assert.h>
 #include <math.h>
 #include <algorithm>
@@ -11,11 +10,7 @@ using namespace bogaudio::dsp;
 void LPFDecimator::setParams(float sampleRate, int factor) {
     _factor = factor;
     _filter.setParams(
-          MultipoleFilter::LP_TYPE,
-          4,
-          factor * sampleRate,
-          0.45f * sampleRate,
-          0
+        MultipoleFilter::LP_TYPE, 4, factor * sampleRate, 0.45f * sampleRate, 0
     );
 }
 

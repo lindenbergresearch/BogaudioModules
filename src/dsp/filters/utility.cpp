@@ -1,4 +1,3 @@
-
 #include "filters/utility.hpp"
 #include <cstdlib>
 

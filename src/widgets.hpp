@@ -98,7 +98,7 @@ struct IndicatorKnob : Knob, SkinnableWidget {
     IKWidget *w;
 
 
-    IndicatorKnob(int dim);
+    explicit IndicatorKnob(int dim);
 
 
     void onHover(const event::Hover &e) override;
@@ -121,7 +121,8 @@ struct IndicatorKnob : Knob, SkinnableWidget {
 
 
 struct IndicatorKnob19 : IndicatorKnob {
-    IndicatorKnob19() : IndicatorKnob(19) {}
+    IndicatorKnob19() :
+        IndicatorKnob(19) {}
 };
 
 
@@ -165,10 +166,7 @@ struct StatefulButton : ParamWidget {
     StatefulButton(const char *offSvgPath, const char *onSvgPath);
 
 
-    void reset() override;
-
-
-    void randomize() override;
+    void reset();
 
 
     void onDragStart(const event::DragStart &e) override;
@@ -211,7 +209,8 @@ struct InvertingIndicatorButton : ParamWidget {
         NVGcolor _color = nvgRGBA(0x00, 0x00, 0x00, 0x00);
 
 
-        IIBWidget(int dim) : _dim(dim) {}
+        IIBWidget(int dim) :
+            _dim(dim) {}
 
 
         void setValue(float v);
@@ -237,10 +236,7 @@ struct InvertingIndicatorButton : ParamWidget {
     inline void setOnChangeCallback(std::function<void(int, float)> fn) { onChangeCB = fn; }
 
 
-    void reset() override;
-
-
-    void randomize() override;
+    void reset();
 
 
     void onHover(const event::Hover &e) override;
@@ -257,12 +253,14 @@ struct InvertingIndicatorButton : ParamWidget {
 
 
 struct InvertingIndicatorButton9 : InvertingIndicatorButton {
-    InvertingIndicatorButton9() : InvertingIndicatorButton(9) {}
+    InvertingIndicatorButton9() :
+        InvertingIndicatorButton(9) {}
 };
 
 
 struct InvertingIndicatorButton18 : InvertingIndicatorButton {
-    InvertingIndicatorButton18() : InvertingIndicatorButton(18) {}
+    InvertingIndicatorButton18() :
+        InvertingIndicatorButton(18) {}
 };
 
 
@@ -295,7 +293,8 @@ struct VUSlider : SliderKnob {
 
 
 struct VUSlider151 : VUSlider {
-    VUSlider151() : VUSlider(151.0f) {}
+    VUSlider151() :
+        VUSlider(151.0f) {}
 };
 
 } // namespace bogaudio

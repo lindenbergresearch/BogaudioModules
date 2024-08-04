@@ -29,7 +29,8 @@ struct Amplifier {
 
 
     struct LevelTable : Table {
-        LevelTable(int n) : Table(n) {}
+        LevelTable(int n) :
+            Table(n) {}
 
 
         void _generate() override;
@@ -44,7 +45,8 @@ struct Amplifier {
     const Table &_table;
 
 
-    Amplifier() : _table(StaticLevelTable::table()) {
+    Amplifier() :
+        _table(StaticLevelTable::table()) {
         setLevel(minDecibels);
     }
 
@@ -71,7 +73,8 @@ struct RunningAverage {
     double _sum = 0;
 
 
-    RunningAverage(float sampleRate = 1000.0f, float sensitivity = 1.0f, float maxDelayMS = 300.0f) : _maxDelayMS(maxDelayMS) {
+    RunningAverage(float sampleRate = 1000.0f, float sensitivity = 1.0f, float maxDelayMS = 300.0f) :
+        _maxDelayMS(maxDelayMS) {
         setSampleRate(sampleRate);
         setSensitivity(sensitivity);
     }
@@ -103,9 +106,7 @@ struct PositiveZeroCrossing {
     const int zeroesForReset = 20;
 
     enum State {
-        NEGATIVE_STATE,
-        POSITIVE_STATE,
-        COUNT_ZEROES_STATE
+        NEGATIVE_STATE, POSITIVE_STATE, COUNT_ZEROES_STATE
     };
 
     State _state;
@@ -113,8 +114,8 @@ struct PositiveZeroCrossing {
     int _zeroCount = 0;
 
 
-    PositiveZeroCrossing(bool triggerable = true)
-          : _triggerable(triggerable) {
+    PositiveZeroCrossing(bool triggerable = true) :
+        _triggerable(triggerable) {
         reset();
     }
 
@@ -207,9 +208,9 @@ struct CrossFader {
 
 
     void setParams(
-          float mix, // -1 to 1, 0 for equal output of both inputs.
-          float curve = 1.0f, // -1 to 1: at -1, A will cut fully as mix goes to 0; at 0, A cuts over full mix; at 1, A cuts from 0 to 1.  B symmetric.
-          bool linear = true// cut is linear in amplitude if true; linear in decibels otherwise.
+        float mix, // -1 to 1, 0 for equal output of both inputs.
+        float curve = 1.0f, // -1 to 1: at -1, A will cut fully as mix goes to 0; at 0, A cuts over full mix; at 1, A cuts from 0 to 1.  B symmetric.
+        bool linear = true// cut is linear in amplitude if true; linear in decibels otherwise.
     );
 
 
@@ -224,7 +225,8 @@ struct Panner {
     const Table &_sineTable;
 
 
-    Panner() : _sineTable(StaticSineTable::table()) {
+    Panner() :
+        _sineTable(StaticSineTable::table()) {
         setPan(0.0f);
     }
 
@@ -246,7 +248,8 @@ struct DelayLine {
     int _trailI;
 
 
-    DelayLine(float sampleRate = 1000.0f, float maxTimeMS = 1000.0f, float time = 1.0f) : _maxTimeMS(maxTimeMS) {
+    DelayLine(float sampleRate = 1000.0f, float maxTimeMS = 1000.0f, float time = 1.0f) :
+        _maxTimeMS(maxTimeMS) {
         setSampleRate(sampleRate);
         setTime(time);
     }

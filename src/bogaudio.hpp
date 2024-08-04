@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 
 #include <algorithm>
 #include <cmath>
@@ -19,5 +19,3 @@
 
 using namespace rack;
 using namespace bogaudio;
-
-extern Plugin *pluginInstance;

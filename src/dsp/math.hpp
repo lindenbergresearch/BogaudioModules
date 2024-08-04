@@ -8,7 +8,8 @@ namespace dsp {
 
 struct FastTanhf {
     struct TanhfTable : Table {
-        TanhfTable(int n) : Table(n) {}
+        TanhfTable(int n) :
+            Table(n) {}
 
 
         void _generate() override;
@@ -20,7 +21,8 @@ struct FastTanhf {
     const Table &_table;
 
 
-    FastTanhf() : _table(StaticTanhfTable::table()) {
+    FastTanhf() :
+        _table(StaticTanhfTable::table()) {
     }
 
 

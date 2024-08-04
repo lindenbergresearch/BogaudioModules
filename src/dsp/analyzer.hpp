@@ -14,7 +14,8 @@ struct Window {
     float _sum;
 
 
-    explicit Window(int size) : _size(size), _window(new float[_size]{}), _sum(0.0) {}
+    explicit Window(int size) :
+        _size(size), _window(new float[_size]{}), _sum(0.0) {}
 
 
     virtual ~Window() {
@@ -25,7 +26,7 @@ struct Window {
     inline int size() const { return _size; }
 
 
-    inline float at(int i) {
+    inline float at(int i) const {
         assert(i >= 0 && i < _size);
         return _window[i];
     }
@@ -44,7 +45,8 @@ struct HanningWindow : Window {
 
 
 struct HammingWindow : HanningWindow {
-    explicit HammingWindow(int size) : HanningWindow(size, 0.54) {}
+    explicit HammingWindow(int size) :
+        HanningWindow(size, 0.54) {}
 };
 
 
@@ -133,31 +135,17 @@ struct FFT32768 {
 
 struct SpectrumAnalyzer : OverlappingBuffer<float> {
     enum Size {
-        SIZE_128 = 128,
-        SIZE_256 = 256,
-        SIZE_512 = 512,
-        SIZE_1024 = 1024,
-        SIZE_2048 = 2048,
-        SIZE_4096 = 4096,
-        SIZE_8192 = 8192,
-        SIZE_16384 = 16384,
-        SIZE_32768 = 32768
+        SIZE_128 = 128, SIZE_256 = 256, SIZE_512 = 512, SIZE_1024 = 1024, SIZE_2048 = 2048, SIZE_4096 = 4096, SIZE_8192 = 8192, SIZE_16384 = 16384, SIZE_32768 = 32768
     };
 
     static constexpr Size maxSize = SIZE_32768;
 
     enum Overlap {
-        OVERLAP_1 = 1,
-        OVERLAP_2 = 2,
-        OVERLAP_4 = 4,
-        OVERLAP_8 = 8
+        OVERLAP_1 = 1, OVERLAP_2 = 2, OVERLAP_4 = 4, OVERLAP_8 = 8
     };
 
     enum WindowType {
-        WINDOW_NONE,
-        WINDOW_HANNING,
-        WINDOW_HAMMING,
-        WINDOW_KAISER
+        WINDOW_NONE, WINDOW_HANNING, WINDOW_HAMMING, WINDOW_KAISER
     };
 
     const float _sampleRate;
@@ -173,11 +161,7 @@ struct SpectrumAnalyzer : OverlappingBuffer<float> {
 
 
     SpectrumAnalyzer(
-          Size size,
-          Overlap overlap,
-          WindowType windowType,
-          float sampleRate,
-          bool autoProcess = true
+        Size size, Overlap overlap, WindowType windowType, float sampleRate, bool autoProcess = true
     );
 
 

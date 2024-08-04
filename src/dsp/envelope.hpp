@@ -27,11 +27,7 @@ struct EnvelopeGenerator : Generator {
 
 struct ADSR : EnvelopeGenerator {
     enum Stage {
-        STOPPED_STAGE,
-        ATTACK_STAGE,
-        DECAY_STAGE,
-        SUSTAIN_STAGE,
-        RELEASE_STAGE
+        STOPPED_STAGE, ATTACK_STAGE, DECAY_STAGE, SUSTAIN_STAGE, RELEASE_STAGE
     };
 
     Stage _stage = STOPPED_STAGE;
@@ -48,7 +44,8 @@ struct ADSR : EnvelopeGenerator {
     float _envelope = 0.0f;
 
 
-    ADSR(bool linear = false, float sampleRate = 1000.0f) : EnvelopeGenerator(sampleRate) {
+    ADSR(bool linear = false, float sampleRate = 1000.0f) :
+        EnvelopeGenerator(sampleRate) {
         setLinearShape(linear);
     }
 

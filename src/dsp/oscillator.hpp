@@ -18,10 +18,9 @@ struct Oscillator {
 
 
     Oscillator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f
-    )
-          : _sampleRate(sampleRate > 1.0 ? sampleRate : 1.0), _frequency(frequency) {
+        float sampleRate = 1000.0f, float frequency = 100.0f
+    ) :
+        _sampleRate(sampleRate > 1.0 ? sampleRate : 1.0), _frequency(frequency) {
     }
 
 
@@ -53,10 +52,9 @@ struct Oscillator {
 
 struct OscillatorGenerator : Oscillator, Generator {
     OscillatorGenerator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f
-    )
-          : Oscillator(sampleRate, frequency) {
+        float sampleRate = 1000.0f, float frequency = 100.0f
+    ) :
+        Oscillator(sampleRate, frequency) {
     }
 };
 
@@ -75,11 +73,9 @@ struct Phasor : OscillatorGenerator {
 
 
     Phasor(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f,
-          float initialPhase = 0.0f
-    )
-          : OscillatorGenerator(sampleRate, frequency) {
+        float sampleRate = 1000.0f, float frequency = 100.0f, float initialPhase = 0.0f
+    ) :
+        OscillatorGenerator(sampleRate, frequency) {
         setPhase(initialPhase);
         _update();
     }
@@ -141,11 +137,9 @@ struct TablePhasor : Phasor {
 
 
     TablePhasor(
-          const Table &table,
-          double sampleRate = 1000.0f,
-          double frequency = 100.0f
-    )
-          : Phasor(sampleRate, frequency), _table(table), _tableLength(table.length()) {
+        const Table &table, double sampleRate = 1000.0f, double frequency = 100.0f
+    ) :
+        Phasor(sampleRate, frequency), _table(table), _tableLength(table.length()) {
     }
 
 
@@ -160,11 +154,9 @@ struct SineOscillator : OscillatorGenerator {
 
 
     SineOscillator(
-          double sampleRate = 1000.0f,
-          double frequency = 100.0f,
-          double initialPhase = 0.0
-    )
-          : OscillatorGenerator(sampleRate, frequency) {
+        double sampleRate = 1000.0f, double frequency = 100.0f, double initialPhase = 0.0
+    ) :
+        OscillatorGenerator(sampleRate, frequency) {
         setPhase(initialPhase);
         update();
     }
@@ -192,20 +184,18 @@ struct SineOscillator : OscillatorGenerator {
 
 struct SineTableOscillator : TablePhasor {
     SineTableOscillator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f
-    )
-          : TablePhasor(StaticSineTable::table(), sampleRate, frequency) {
+        float sampleRate = 1000.0f, float frequency = 100.0f
+    ) :
+        TablePhasor(StaticSineTable::table(), sampleRate, frequency) {
     }
 };
 
 
 struct SawOscillator : Phasor {
     SawOscillator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f
-    )
-          : Phasor(sampleRate, frequency) {
+        float sampleRate = 1000.0f, float frequency = 100.0f
+    ) :
+        Phasor(sampleRate, frequency) {
     }
 
 
@@ -220,10 +210,9 @@ struct SaturatingSawOscillator : SawOscillator {
 
 
     SaturatingSawOscillator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f
-    )
-          : SawOscillator(sampleRate, frequency), _saturation(0.0f), _saturationNormalization(1.0f) {
+        float sampleRate = 1000.0f, float frequency = 100.0f
+    ) :
+        SawOscillator(sampleRate, frequency), _saturation(0.0f), _saturationNormalization(1.0f) {
     }
 
 
@@ -242,12 +231,8 @@ struct BandLimitedSawOscillator : SaturatingSawOscillator {
 
 
     BandLimitedSawOscillator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f,
-          int quality = 5,
-          const Table &table = StaticBlepTable::table()
-    )
-          : SaturatingSawOscillator(sampleRate, frequency), _quality(quality), _table(table), _halfTableLen(_table.length() / 2) {
+        float sampleRate = 1000.0f, float frequency = 100.0f, int quality = 5, const Table &table = StaticBlepTable::table()) :
+        SaturatingSawOscillator(sampleRate, frequency), _quality(quality), _table(table), _halfTableLen(_table.length() / 2) {
         setQuality(quality);
     }
 
@@ -272,10 +257,9 @@ struct SquareOscillator : Phasor {
 
 
     SquareOscillator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f
-    )
-          : Phasor(sampleRate, frequency) {
+        float sampleRate = 1000.0f, float frequency = 100.0f
+    ) :
+        Phasor(sampleRate, frequency) {
     }
 
 
@@ -297,12 +281,8 @@ struct BandLimitedSquareOscillator : BandLimitedSawOscillator {
 
 
     BandLimitedSquareOscillator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f,
-          int quality = 5,
-          const Table &table = StaticBlepTable::table()
-    )
-          : BandLimitedSawOscillator(sampleRate, frequency, quality, table) {
+        float sampleRate = 1000.0f, float frequency = 100.0f, int quality = 5, const Table &table = StaticBlepTable::table()) :
+        BandLimitedSawOscillator(sampleRate, frequency, quality, table) {
         setPulseWidth(0.5f);
     }
 
@@ -320,10 +300,9 @@ struct TriangleOscillator : Phasor {
 
 
     TriangleOscillator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f
-    )
-          : Phasor(sampleRate, frequency) {
+        float sampleRate = 1000.0f, float frequency = 100.0f
+    ) :
+        Phasor(sampleRate, frequency) {
     }
 
 
@@ -339,9 +318,7 @@ struct SteppedRandomOscillator : Phasor {
 
 
     SteppedRandomOscillator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f,
-          phase_t seed = 0
+        float sampleRate = 1000.0f, float frequency = 100.0f, phase_t seed = 0
     );
 
 
@@ -366,8 +343,8 @@ struct SineBankOscillator : Oscillator {
         SineTableOscillator sine;
 
 
-        Partial()
-              : frequency(0.0), frequencyRatio(0.0), amplitude(0.0), amplitudeTarget(0.0), amplitudeStepDelta(0.0), amplitudeSteps(0), sine(0.0, 0.0) {}
+        Partial() :
+            frequency(0.0), frequencyRatio(0.0), amplitude(0.0), amplitudeTarget(0.0), amplitudeStepDelta(0.0), amplitudeSteps(0), sine(0.0, 0.0) {}
     };
 
 
@@ -379,11 +356,9 @@ struct SineBankOscillator : Oscillator {
 
 
     SineBankOscillator(
-          float sampleRate = 1000.0f,
-          float frequency = 100.0f,
-          int partialCount = 20
-    )
-          : Oscillator(sampleRate, frequency), _partials(partialCount) {
+        float sampleRate = 1000.0f, float frequency = 100.0f, int partialCount = 20
+    ) :
+        Oscillator(sampleRate, frequency), _partials(partialCount) {
         _sampleRateChanged();
         _frequencyChanged();
     }
@@ -437,13 +412,9 @@ struct ChirpOscillator : OscillatorGenerator {
 
 
     ChirpOscillator(
-          float sampleRate = 1000.0f,
-          float frequency1 = 100.0f,
-          float frequency2 = 300.0f,
-          float time = 1.0f,
-          bool linear = true
-    )
-          : _oscillator(sampleRate) {
+        float sampleRate = 1000.0f, float frequency1 = 100.0f, float frequency2 = 300.0f, float time = 1.0f, bool linear = true
+    ) :
+        _oscillator(sampleRate) {
         setParams(frequency1, frequency2, time, linear);
     }
 
@@ -485,11 +456,7 @@ struct PureChirpOscillator : OscillatorGenerator {
 
 
     PureChirpOscillator(
-          float sampleRate = 1000.0f,
-          float frequency1 = 100.0f,
-          float frequency2 = 300.0f,
-          float time = 1.0f,
-          bool linear = true
+        float sampleRate = 1000.0f, float frequency1 = 100.0f, float frequency2 = 300.0f, float time = 1.0f, bool linear = true
     ) {
         setParams(frequency1, frequency2, time, linear);
     }

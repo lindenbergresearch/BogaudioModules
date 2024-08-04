@@ -18,10 +18,7 @@ struct Equalizer : Filter {
 
 
     void setParams(
-          float sampleRate,
-          float lowDb,
-          float midDb,
-          float highDb
+        float sampleRate, float lowDb, float midDb, float highDb
     );
 
 

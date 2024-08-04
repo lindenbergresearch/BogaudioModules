@@ -1,4 +1,3 @@
-
 #include "widgets.hpp"
 #include "skins.hpp"
 #include "dsp/signal.hpp"
@@ -63,33 +62,40 @@ void BGKnob::skinChanged(const std::string &skin) {
 }
 
 
-Knob16::Knob16() : BGKnob("knob_16px", 16) {
+Knob16::Knob16() :
+    BGKnob("knob_16px", 16) {
     shadow->box.pos = Vec(0.0, 2.5);
 }
 
 
-Knob19::Knob19() : BGKnob("knob_19px", 19) {
+Knob19::Knob19() :
+    BGKnob("knob_19px", 19) {
     shadow->box.pos = Vec(0.0, 2.5);
 }
 
 
-Knob26::Knob26() : BGKnob("knob_26px", 26) {
+Knob26::Knob26() :
+    BGKnob("knob_26px", 26) {
 }
 
 
-Knob29::Knob29() : BGKnob("knob_29px", 29) {
+Knob29::Knob29() :
+    BGKnob("knob_29px", 29) {
 }
 
 
-Knob38::Knob38() : BGKnob("knob_38px", 38) {
+Knob38::Knob38() :
+    BGKnob("knob_38px", 38) {
 }
 
 
-Knob45::Knob45() : BGKnob("knob_45px", 45) {
+Knob45::Knob45() :
+    BGKnob("knob_45px", 45) {
 }
 
 
-Knob68::Knob68() : BGKnob("knob_68px", 68) {
+Knob68::Knob68() :
+    BGKnob("knob_68px", 68) {
     shadow->box.pos = Vec(0.0, 4.0);
 }
 
@@ -224,8 +230,8 @@ void IndicatorKnob::onHover(const event::Hover &e) {
 
 void IndicatorKnob::onChange(const event::Change &e) {
     fb->dirty = true;
-    if (paramQuantity) {
-        w->setAngle(paramQuantity->getValue());
+    if (getParamQuantity()) {
+        w->setAngle(getParamQuantity()->getValue());
     }
     Knob::onChange(e);
 }
@@ -315,29 +321,19 @@ StatefulButton::StatefulButton(const char *offSvgPath, const char *onSvgPath) {
 
 
 void StatefulButton::reset() {
-    if (paramQuantity) {
-        paramQuantity->reset();
-    }
-}
-
-
-void StatefulButton::randomize() {
-    if (paramQuantity) {
-        float min = paramQuantity->getMinValue();
-        float max = paramQuantity->getMaxValue();
-        float value = roundf(min + (max - min) * random::uniform());
-        paramQuantity->setValue(value);
+    if (getParamQuantity()) {
+        getParamQuantity()->reset();
     }
 }
 
 
 void StatefulButton::onDragStart(const event::DragStart &e) {
-    if (paramQuantity) {
+    if (getParamQuantity()) {
         _svgWidget->setSvg(_frames[1]);
-        if (paramQuantity->getValue() >= paramQuantity->getMaxValue()) {
-            paramQuantity->setValue(paramQuantity->getMinValue());
+        if (getParamQuantity()->getValue() >= getParamQuantity()->getMaxValue()) {
+            getParamQuantity()->setValue(getParamQuantity()->getMinValue());
         } else {
-            paramQuantity->setValue(paramQuantity->getValue() + 1.0);
+            getParamQuantity()->setValue(getParamQuantity()->getValue() + 1.0);
         }
     }
 }
@@ -348,11 +344,13 @@ void StatefulButton::onDragEnd(const event::DragEnd &e) {
 }
 
 
-StatefulButton9::StatefulButton9() : StatefulButton("res/button_9px_0.svg", "res/button_9px_1.svg") {
+StatefulButton9::StatefulButton9() :
+    StatefulButton("res/button_9px_0.svg", "res/button_9px_1.svg") {
 }
 
 
-StatefulButton18::StatefulButton18() : StatefulButton("res/button_18px_0.svg", "res/button_18px_1.svg") {
+StatefulButton18::StatefulButton18() :
+    StatefulButton("res/button_18px_0.svg", "res/button_18px_1.svg") {
 }
 
 
@@ -466,15 +464,8 @@ InvertingIndicatorButton::InvertingIndicatorButton(int dim) {
 
 
 void InvertingIndicatorButton::reset() {
-    if (paramQuantity) {
-        paramQuantity->reset();
-    }
-}
-
-
-void InvertingIndicatorButton::randomize() {
-    if (paramQuantity) {
-        paramQuantity->setValue(roundf(2.0f * random::uniform()) - 1.0f);
+    if (getParamQuantity()) {
+        getParamQuantity()->reset();
     }
 }
 
@@ -490,30 +481,30 @@ void InvertingIndicatorButton::onHover(const event::Hover &e) {
 
 void InvertingIndicatorButton::onButton(const event::Button &e) {
     ParamWidget::onButton(e);
-    if (!paramQuantity || !(e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0) || e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+    if (!getParamQuantity() || !(e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0) || e.button == GLFW_MOUSE_BUTTON_RIGHT) {
         return;
     }
 
-    float value = paramQuantity->getValue();
+    float value = getParamQuantity()->getValue();
     if (value <= -1.0f) {
-        paramQuantity->setValue(0.0f);
+        getParamQuantity()->setValue(0.0f);
     } else if (value < 1.0f) {
-        paramQuantity->setValue(1.0f);
-    } else if (paramQuantity->minValue < 0.0f && (!clickToInvertCB || clickToInvertCB())) {
-        paramQuantity->setValue(-1.0f);
+        getParamQuantity()->setValue(1.0f);
+    } else if (getParamQuantity()->minValue < 0.0f && (!clickToInvertCB || clickToInvertCB())) {
+        getParamQuantity()->setValue(-1.0f);
     } else {
-        paramQuantity->setValue(0.0f);
+        getParamQuantity()->setValue(0.0f);
     }
 }
 
 
 void InvertingIndicatorButton::onChange(const event::Change &e) {
     fb->dirty = true;
-    if (paramQuantity) {
-        float v = paramQuantity->getValue();
+    if (getParamQuantity()) {
+        float v = getParamQuantity()->getValue();
         w->setValue(v);
         if (onChangeCB) {
-            onChangeCB(paramQuantity->paramId, v);
+            onChangeCB(getParamQuantity()->paramId, v);
         }
     }
     ParamWidget::onChange(e);
@@ -536,8 +527,8 @@ NVGcolor bogaudio::decibelsToColor(float db) {
 
 void VUSlider::draw(const DrawArgs &args) {
     float level = 0.0f;
-    if (paramQuantity) {
-        level = paramQuantity->getValue();
+    if (getParamQuantity()) {
+        level = getParamQuantity()->getValue();
     } else {
         float minDb = -60.0f;
         float maxDb = 6.0f;

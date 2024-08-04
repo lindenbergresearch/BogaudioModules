@@ -1,7 +1,7 @@
 {
   "slug": "Lindenberg-Bogaudio",
   "name": "Lindenberg-Bogaudio",
-  "version": "1.1.37_LB",
+  "version": "2.0.0",
   "license": "GPL-3.0-or-later",
   "brand": "Lindenberg-Bogaudio",
   "author": "Matt Demanett, Patrick Lindenberg",
@@ -14,28 +14,10 @@
   "changeLogUrl": "https://github.com/bogaudio/BogaudioModules/releases",
   "modules": [
     {
-      "slug": "Lindenberg-Bogaudio-Analyzer",
-      "name": "ANALYZER",
-      "description": "4-channel spectrum analyzer",
-      "manualUrl": "https://github.com/bogaudio/BogaudioModules/blob/master/README.md#analyzer",
-      "tags": [
-        "Visual"
-      ]
-    },
-    {
-      "slug": "Lindenberg-Bogaudio-Analyzer2",
-      "name": "ANALYZER-2",
-      "description": "4-channel deep spectrum analyzer",
-      "manualUrl": "https://github.com/bogaudio/BogaudioModules/blob/master/README.md#analyzerxl",
-      "tags": [
-        "Visual"
-      ]
-    },
-    {
-      "slug": "Lindenberg-Bogaudio-Ranalyzer",
-      "name": "RANALYZER",
-      "description": "Swept-sine frequency response analyzer",
-      "manualUrl": "https://github.com/bogaudio/BogaudioModules/blob/master/README.md#ranalyzer",
+      "slug": "DSA4",
+      "name": "DEEP-SPECTRUM-ANALYZER-4",
+      "description": "4-channel Deep Spectrum Analyzer",
+      "manualUrl": "",
       "tags": [
         "Visual"
       ]

@@ -9,11 +9,11 @@ namespace bogaudio {
 namespace dsp {
 
 class Table {
-protected:
+  protected:
     int _length = 0;
     float *_table = NULL;
 
-public:
+  public:
     Table(int n = 10) {
         assert(n > 0);
         assert(n <= 16);
@@ -41,14 +41,14 @@ public:
     void generate();
 
 
-protected:
+  protected:
     virtual void _generate() = 0;
 };
 
 
 template<class T, int N>
 class StaticTable {
-private:
+  private:
     Table *_table = NULL;
     std::mutex _lock;
 
@@ -64,7 +64,7 @@ private:
     }
 
 
-public:
+  public:
     StaticTable(const StaticTable &) = delete;
 
 
@@ -84,7 +84,8 @@ public:
 
 
 struct SineTable : Table {
-    SineTable(int n = 10) : Table(n) {}
+    SineTable(int n = 10) :
+        Table(n) {}
 
 
     void _generate() override;
@@ -96,7 +97,8 @@ struct StaticSineTable : StaticTable<SineTable, 12> {
 
 
 struct BlepTable : Table {
-    BlepTable(int n = 10) : Table(n) {}
+    BlepTable(int n = 10) :
+        Table(n) {}
 
 
     void _generate() override;

@@ -1,4 +1,3 @@
-
 #include <assert.h>
 
 #include "filters/equalizer.hpp"
@@ -7,10 +6,7 @@ using namespace bogaudio::dsp;
 
 
 void Equalizer::setParams(
-      float sampleRate,
-      float lowDb,
-      float midDb,
-      float highDb
+    float sampleRate, float lowDb, float midDb, float highDb
 ) {
     assert(lowDb >= cutDb && lowDb <= gainDb);
     assert(midDb >= cutDb && midDb <= gainDb);

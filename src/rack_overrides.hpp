@@ -11,8 +11,8 @@ struct Trigger : rack::dsp::SchmittTrigger {
     float _lowThreshold;
 
 
-    Trigger(float highThreshold = 1.0f, float lowThreshold = 0.1f)
-          : _highThreshold(highThreshold), _lowThreshold(lowThreshold) {
+    Trigger(float highThreshold = 1.0f, float lowThreshold = 0.1f) :
+        _highThreshold(highThreshold), _lowThreshold(lowThreshold) {
         assert(_highThreshold > _lowThreshold);
         reset();
     }
@@ -27,8 +27,8 @@ struct NegativeTrigger : rack::dsp::SchmittTrigger {
     float _lowThreshold;
 
 
-    NegativeTrigger(float highThreshold = -1.0f, float lowThreshold = -0.1f)
-          : _highThreshold(highThreshold), _lowThreshold(lowThreshold) {
+    NegativeTrigger(float highThreshold = -1.0f, float lowThreshold = -0.1f) :
+        _highThreshold(highThreshold), _lowThreshold(lowThreshold) {
         assert(_highThreshold < _lowThreshold);
         reset();
     }

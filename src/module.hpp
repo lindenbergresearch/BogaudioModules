@@ -28,11 +28,10 @@ struct BGModule : Module {
     std::vector<SkinChangeListener *> _skinChangeListeners;
 
 
-    BGModule() {
-    }
+    BGModule() = default;
 
 
-    virtual ~BGModule() {
+    ~BGModule() override {
         while (_channels >= 1) {
             removeChannel(_channels - 1);
             --_channels;

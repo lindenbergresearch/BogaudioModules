@@ -9,7 +9,7 @@ namespace bogaudio {
 namespace dsp {
 
 class Seeds {
-private:
+  private:
     std::mt19937 _generator;
 
 
@@ -19,7 +19,7 @@ private:
     unsigned int _next();
 
 
-public:
+  public:
     Seeds(const Seeds &) = delete;
 
 
@@ -36,7 +36,8 @@ public:
 struct NoiseGenerator : Generator {
     std::minstd_rand _generator; // one of the faster options.
 
-    NoiseGenerator() : _generator(Seeds::next()) {}
+    NoiseGenerator() :
+        _generator(Seeds::next()) {}
 };
 
 
@@ -44,7 +45,8 @@ struct WhiteNoiseGenerator : NoiseGenerator {
     std::uniform_real_distribution<float> _uniform;
 
 
-    WhiteNoiseGenerator() : _uniform(-1.0, 1.0) {}
+    WhiteNoiseGenerator() :
+        _uniform(-1.0, 1.0) {}
 
 
     float _next() override {
@@ -101,7 +103,8 @@ struct GaussianNoiseGenerator : NoiseGenerator {
     std::normal_distribution<float> _normal;
 
 
-    GaussianNoiseGenerator(float mean = 0.0f, float stdDev = 1.0f) : _normal(mean, stdDev) {}
+    GaussianNoiseGenerator(float mean = 0.0f, float stdDev = 1.0f) :
+        _normal(mean, stdDev) {}
 
 
     float _next() override {
@@ -123,12 +126,9 @@ struct RandomWalk : Generator {
 
 
     RandomWalk(
-          float min = -5.0f,
-          float max = 5.0f,
-          float sampleRate = 1000.0f,
-          float change = 0.5f
-    )
-          : _min(min), _max(max) {
+        float min = -5.0f, float max = 5.0f, float sampleRate = 1000.0f, float change = 0.5f
+    ) :
+        _min(min), _max(max) {
         assert(_min < _max);
         setParams(sampleRate, change);
     }

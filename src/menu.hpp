@@ -12,8 +12,8 @@ struct OptionMenuItem : MenuItem {
     std::function<void()> _set;
 
 
-    OptionMenuItem(const char *label, std::function<bool()> check, std::function<void()> set)
-          : _check(check), _set(set) {
+    OptionMenuItem(const char *label, std::function<bool()> check, std::function<void()> set) :
+        _check(check), _set(set) {
         this->text = label;
     }
 
@@ -31,19 +31,19 @@ struct OptionMenuItem : MenuItem {
 
 
 struct BoolOptionMenuItem : OptionMenuItem {
-    BoolOptionMenuItem(const char *label, std::function<bool *()> get)
-          : OptionMenuItem(
-          label, [=]() { return *(get()); }, [=]() {
+    BoolOptionMenuItem(const char *label, std::function<bool *()> get) :
+        OptionMenuItem(
+            label, [=]() { return *(get()); }, [=]() {
               bool *b = get();
               *b = !*b;
-          }
-    ) {}
+            }
+        ) {}
 };
 
 
 struct SpacerOptionMenuItem : OptionMenuItem {
-    SpacerOptionMenuItem()
-          : OptionMenuItem("<spacer>", []() { return false; }, []() {}) {}
+    SpacerOptionMenuItem() :
+        OptionMenuItem("<spacer>", []() { return false; }, []() {}) {}
 };
 
 

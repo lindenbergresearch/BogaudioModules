@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <atomic>
@@ -36,19 +35,12 @@ struct ChannelAnalyzer {
 
 
     ChannelAnalyzer(
-        SpectrumAnalyzer::Size size,
-        SpectrumAnalyzer::Overlap overlap,
-        SpectrumAnalyzer::WindowType windowType,
-        float sampleRate,
-        int averageN,
-        int binSize,
-        float *outBuf1,
-        float *outBuf2,
-        std::atomic<float *> &currentOutBuf
-    )
-        : _analyzer(size, overlap, windowType, sampleRate, false), _binsN(size / binSize), _bins0(outBuf1), _bins1(outBuf2), _currentBins(_bins0), _currentOutBuf(currentOutBuf),
-          _averagedBins(averageN == 1 ? NULL : new AveragingBuffer<float>(_binsN, averageN)), _stepBufN(size / overlap), _stepBuf(new float[_stepBufN]{}), _workerBufN(size + 1),
-          _workerBuf(new float[_workerBufN]{}), _worker(&ChannelAnalyzer::work, this) {
+        SpectrumAnalyzer::Size size, SpectrumAnalyzer::Overlap overlap, SpectrumAnalyzer::WindowType windowType, float sampleRate, int averageN, int binSize, float *outBuf1
+        , float *outBuf2, std::atomic<float *> &currentOutBuf
+    ) :
+        _analyzer(size, overlap, windowType, sampleRate, false), _binsN(size / binSize), _bins0(outBuf1), _bins1(outBuf2), _currentBins(_bins0), _currentOutBuf(currentOutBuf)
+        , _averagedBins(averageN == 1 ? NULL : new AveragingBuffer<float>(_binsN, averageN)), _stepBufN(size / overlap), _stepBuf(new float[_stepBufN]{}), _workerBufN(size + 1)
+        , _workerBuf(new float[_workerBufN]{}), _worker(&ChannelAnalyzer::work, this) {
         assert(averageN >= 1);
         assert(binSize >= 1);
     }
@@ -63,21 +55,15 @@ struct ChannelAnalyzer {
     void work();
 };
 
+/* ------------------------------------------------------------------------------------------- */
 
 struct AnalyzerCore {
     enum Quality {
-        QUALITY_ULTRA,
-        QUALITY_HIGH,
-        QUALITY_GOOD,
-        QUALITY_FIXED_16K,
-        QUALITY_FIXED_32K,
-        QUALITY_ULTRA_ULTRA
+        QUALITY_ULTRA, QUALITY_HIGH, QUALITY_GOOD, QUALITY_FIXED_16K, QUALITY_FIXED_32K, QUALITY_ULTRA_ULTRA
     };
 
     enum Window {
-        WINDOW_NONE,
-        WINDOW_HAMMING,
-        WINDOW_KAISER
+        WINDOW_NONE, WINDOW_HAMMING, WINDOW_KAISER
     };
 
     int _nChannels;
@@ -96,9 +82,10 @@ struct AnalyzerCore {
     std::mutex _channelsMutex;
 
 
-    AnalyzerCore(int nChannels, SpectrumAnalyzer::Overlap overlap = SpectrumAnalyzer::OVERLAP_2)
-        : _nChannels(nChannels), _channels(new ChannelAnalyzer *[_nChannels]{}), _outBufs(new float[2 * nChannels * _outBufferN]{}), _currentOutBufs(new std::atomic<float *>[nChannels]),
-          _overlap(overlap) {
+    AnalyzerCore(int nChannels, SpectrumAnalyzer::Overlap overlap = SpectrumAnalyzer::OVERLAP_2) :
+        _nChannels(nChannels), _channels(new ChannelAnalyzer *[_nChannels]{}), _outBufs(new float[2 * nChannels * _outBufferN]{}), _currentOutBufs(
+        new std::atomic<float *>[nChannels]
+    ), _overlap(overlap) {
         for (int i = 0; i < nChannels; ++i) {
             _currentOutBufs[i] = _outBufs + 2 * i * _outBufferN;
         }
@@ -125,7 +112,7 @@ struct AnalyzerCore {
     SpectrumAnalyzer::Size size();
 
 
-    SpectrumAnalyzer::WindowType window();
+    SpectrumAnalyzer::WindowType window() const;
 
 
     inline float *getBins(int i) const {
@@ -143,19 +130,20 @@ struct AnalyzerCore {
     void stepChannelSample(int channelIndex, float sample);
 };
 
+/* ------------------------------------------------------------------------------------------- */
+
 
 struct AnalyzerTypes {
     enum FrequencyPlot {
-        LOG_FP,
-        LINEAR_FP
+        LOG_FP, LINEAR_FP
     };
 
     enum AmplitudePlot {
-        DECIBELS_80_AP,
-        DECIBELS_140_AP,
-        PERCENTAGE_AP
+        DECIBELS_80_AP, DECIBELS_140_AP, PERCENTAGE_AP
     };
 };
+
+/* ------------------------------------------------------------------------------------------- */
 
 
 struct AnalyzerBase : BGModule, AnalyzerTypes {
@@ -166,49 +154,37 @@ struct AnalyzerBase : BGModule, AnalyzerTypes {
     AmplitudePlot _amplitudePlot = DECIBELS_80_AP;
     AnalyzerCore _core;
 
-
     AnalyzerBase(
-        int nChannels,
-        int np,
-        int ni,
-        int no,
-        int nl = 0,
-        SpectrumAnalyzer::Overlap overlap = SpectrumAnalyzer::OVERLAP_2
-    )
-        : _core(nChannels, overlap) {
+        int nChannels, int np, int ni, int no, int nl = 0, SpectrumAnalyzer::Overlap overlap = SpectrumAnalyzer::OVERLAP_2
+    ) :
+        _core(nChannels, overlap) {
         config(np, ni, no, nl);
     }
 
-
     void frequencyPlotToJson(json_t *root) const;
-
 
     void frequencyPlotFromJson(json_t *root);
 
-
     void frequencyRangeToJson(json_t *root);
-
 
     void frequencyRangeFromJson(json_t *root);
 
-
     void amplitudePlotToJson(json_t *root);
-
 
     void amplitudePlotFromJson(json_t *root);
 };
 
+/* ------------------------------------------------------------------------------------------- */
 
 struct AnalyzerBaseWidget : BGModuleWidget {
     void addFrequencyPlotContextMenu(Menu *menu);
 
-
     void addFrequencyRangeContextMenu(Menu *menu);
-
 
     void addAmplitudePlotContextMenu(Menu *menu, bool linearOption = true);
 };
 
+/* ------------------------------------------------------------------------------------------- */
 
 struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
     struct BinsReader {
@@ -226,62 +202,61 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
         float *_bins;
 
 
-        GenericBinsReader(float *bins) : _bins(bins) {}
+        explicit GenericBinsReader(float *bins) :
+            _bins(bins) {}
 
 
         float at(int i) override { return _bins[i]; }
     };
 
-
     typedef std::function<std::unique_ptr<BinsReader>(AnalyzerCore &)> BinsReaderFactory;
 
-    const int _insetAround = 0;
-    const int _insetLeft = _insetAround + 25;
-    const int _insetRight = _insetAround + 10;
-    const int _insetTop = _insetAround + 20;
-    const int _insetBottom = _insetAround + 16;
 
-
-
-    const float _displayDB = 140.0;
-    const float _positiveDisplayDB = 20.0;
-    const float _totalLinearAmplitude = 1.2;
-
+    const float displayDB = 140.0;
+    const float positiveDisplayDB = 20.0;
+    const float totalLinearAmplitude = 1.2;
     const float baseXAxisLogFactor = 1 / 3.321; // magic number.
 
-    const NVGcolor _axisColor = nvgRGBAf(0.2f, 0.2f, 0.2f, 1.f);
-    const NVGcolor _textColor = nvgRGBAf(0.99f, 0.99f, 0.99f, 1);
-    const NVGcolor _highlightAxisColor = nvgRGBAf(0.45f, 0.35f, 0.35f, 0.8);
+    const NVGcolor axisColor = nvgRGBAf(0.2f, 0.2f, 0.2f, 1.f);
+    const NVGcolor textColor = nvgRGBAf(0.99f, 0.99f, 0.99f, 1);
+    const NVGcolor highlightAxisColor = nvgRGBAf(0.45f, 0.35f, 0.35f, 0.8);
 
-    static constexpr int channelColorsN = 4;
-    NVGcolor _channelColors[channelColorsN] = {
-        nvgRGBAf(0, 0.6, 1, 0.9),
-        nvgRGBAf(1, 0.2, 0, 0.9),
-        nvgRGBAf(0, 0.1, 1, 0.9),
-        nvgRGBAf(1, 1, 0.1, 0.9)
-    };
+    static constexpr int CHANNEL_COUNT = 4;
+    NVGcolor channelColors[CHANNEL_COUNT] = {nvgRGBAf(0, 0.6, 1, 0.9), nvgRGBAf(1, 0.2, 0, 0.9), nvgRGBAf(0, 0.1, 1, 0.9), nvgRGBAf(1, 1, 0.1, 0.9)};
 
     AnalyzerBase *_module;
-    const Vec _size;
-    const Vec _graphSize;
-    bool _drawInset;
-    std::shared_ptr<Font> _font;
+    ModuleWidget *moduleWidget;
+    Vec _size;
+    Vec _graphSize;
+
+    const float insetAround = 0;
+    const float insetLeft = insetAround + 25;
+    const float insetRight = insetAround + 30;
+    const float insetTop = insetAround + 23;
+    const float insetBottom = insetAround + 18;
+    bool drawInset;
+
+    std::shared_ptr<Font> displayFont;
+
     float _xAxisLogFactor = baseXAxisLogFactor;
-    BinsReaderFactory *_channelBinsReaderFactories = nullptr;
+    BinsReaderFactory *channelBinsReaderFactories = nullptr;
     bool *_displayChannel = nullptr;
     std::string *_channelLabels = nullptr;
-    Vec _freezeMouse;
-    bool _freezeDraw = false;
-    float *_freezeBufs = nullptr;
-    int _freezeNudgeBin = 0;
-    int _freezeLastBinI = -1;
+
+    Vec freezeMouse;
+    bool freezeDraw = false;
+    float *freezeBufs = nullptr;
+    int freezeNudgeBin = 0;
+    int freezeLastBinI = -1;
 
 
-    AnalyzerDisplay(AnalyzerBase *module, Vec size, bool drawInset)
-        : _module(module), _size(size), _graphSize(_size.x - _insetLeft - _insetRight, _size.y - _insetTop - _insetBottom), _drawInset(drawInset),
-          _font(APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/VeraMoBd.ttf"))) {
+    AnalyzerDisplay(AnalyzerBase *module, Vec size, bool drawInset) :
+        _module(module), moduleWidget(nullptr), _size(size), drawInset(drawInset), displayFont(
+        APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/VeraMoBd.ttf"))) {
         if (_module) {
-            _channelBinsReaderFactories = new BinsReaderFactory[_module->_core._nChannels]{};
+            _graphSize = Vec(_size.x - insetLeft - insetRight, _size.y - insetTop - insetBottom);
+
+            channelBinsReaderFactories = new BinsReaderFactory[_module->_core._nChannels]{};
             _displayChannel = new bool[_module->_core._nChannels]{};
             _channelLabels = new std::string[_module->_core._nChannels];
             std::fill_n(_displayChannel, _module->_core._nChannels, true);
@@ -289,14 +264,28 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
     }
 
 
-    ~AnalyzerDisplay() {
+    ~AnalyzerDisplay() override {
         if (_module) {
-            delete[] _channelBinsReaderFactories;
+            delete[] channelBinsReaderFactories;
             delete[] _displayChannel;
             delete[] _channelLabels;
         }
     }
 
+
+    void setNewSize(Vec size) {
+        _size = size;
+        _graphSize = Vec(
+            _size.x - insetLeft - insetRight, _size.y - insetTop - insetBottom
+        );
+        box.size = _size;
+    }
+
+    ModuleWidget *&module_widget() { return moduleWidget; }
+
+    void setModuleWidget(ModuleWidget *module_widget) {
+        moduleWidget = module_widget;
+    }
 
     void onButton(const event::Button &e) override;
 
@@ -362,6 +351,8 @@ struct AnalyzerDisplay : TransparentWidget, AnalyzerTypes {
 
 
     static float dbToBinValue(float db);
+
+    const NVGcolor &getInputPortColor(int portID, const NVGcolor &fallback);
 };
 
-} // namespace bogaudio
+}

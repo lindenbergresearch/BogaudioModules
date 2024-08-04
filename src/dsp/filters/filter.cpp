@@ -1,4 +1,3 @@
-
 #include <math.h>
 
 #include "filters/filter.hpp"
@@ -20,12 +19,6 @@ void LowPassFilter::setParams(float sampleRate, float cutoff, float q) {
     double cosw0 = cos(w0);
     double alpha = sin(w0) / (2.0 * _q);
 
-    _biquad.setParams(
-          (1.0 - cosw0) / 2.0,
-          1.0 - cosw0,
-          (1.0 - cosw0) / 2.0,
-          1.0 + alpha,
-          -2.0 * cosw0,
-          1.0 - alpha
+    _biquad.setParams((1.0 - cosw0) / 2.0, 1.0 - cosw0, (1.0 - cosw0) / 2.0, 1.0 + alpha, -2.0 * cosw0, 1.0 - alpha
     );
 }

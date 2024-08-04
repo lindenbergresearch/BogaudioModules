@@ -1,4 +1,3 @@
-
 #include <assert.h>
 #include <math.h>
 #include <algorithm>
@@ -57,7 +56,9 @@ float Biquad4::next(float sample) {
 
 
 template<>
-void BiquadBank<MultimodeTypes::T, 4>::setParams(int i, MultimodeTypes::T a0, MultimodeTypes::T a1, MultimodeTypes::T a2, MultimodeTypes::T b0, MultimodeTypes::T b1, MultimodeTypes::T b2) {
+void BiquadBank<MultimodeTypes::T, 4>::setParams(
+    int i, MultimodeTypes::T a0, MultimodeTypes::T a1, MultimodeTypes::T a2, MultimodeTypes::T b0, MultimodeTypes::T b1, MultimodeTypes::T b2
+) {
     assert(i >= 0 && i < 4);
     _biquads->setParams(i, a0, a1, a2, b0, b1, b2);
 }
@@ -82,7 +83,9 @@ float BiquadBank<MultimodeTypes::T, 4>::next(float sample) {
 
 
 template<>
-void BiquadBank<MultimodeTypes::T, 8>::setParams(int i, MultimodeTypes::T a0, MultimodeTypes::T a1, MultimodeTypes::T a2, MultimodeTypes::T b0, MultimodeTypes::T b1, MultimodeTypes::T b2) {
+void BiquadBank<MultimodeTypes::T, 8>::setParams(
+    int i, MultimodeTypes::T a0, MultimodeTypes::T a1, MultimodeTypes::T a2, MultimodeTypes::T b0, MultimodeTypes::T b1, MultimodeTypes::T b2
+) {
     assert(i >= 0 && i < 8);
     _biquads[i / 4].setParams(i % 4, a0, a1, a2, b0, b1, b2);
 }
@@ -118,7 +121,9 @@ float BiquadBank<MultimodeTypes::T, 8>::next(float sample) {
 
 
 template<>
-void BiquadBank<MultimodeTypes::T, 16>::setParams(int i, MultimodeTypes::T a0, MultimodeTypes::T a1, MultimodeTypes::T a2, MultimodeTypes::T b0, MultimodeTypes::T b1, MultimodeTypes::T b2) {
+void BiquadBank<MultimodeTypes::T, 16>::setParams(
+    int i, MultimodeTypes::T a0, MultimodeTypes::T a1, MultimodeTypes::T a2, MultimodeTypes::T b0, MultimodeTypes::T b1, MultimodeTypes::T b2
+) {
     assert(i >= 0 && i < 16);
     _biquads[i / 4].setParams(i % 4, a0, a1, a2, b0, b1, b2);
 }
@@ -216,16 +221,7 @@ float MultimodeDesigner<N>::effectiveMinimumFrequency() {
 
 template<int N>
 void MultimodeDesigner<N>::setParams(
-      BiquadBank<T, N> &biquads,
-      float &outGain,
-      float sampleRate,
-      Type type,
-      int poles,
-      Mode mode,
-      float frequency,
-      float qbw,
-      BandwidthMode bwm,
-      DelayMode dm
+    BiquadBank<T, N> &biquads, float &outGain, float sampleRate, Type type, int poles, Mode mode, float frequency, float qbw, BandwidthMode bwm, DelayMode dm
 ) {
     assert(N >= minPoles && N <= maxPoles);
     assert(poles >= minPoles && (poles <= N || (poles <= 2 * N && (mode == LOWPASS_MODE || mode == HIGHPASS_MODE))));
@@ -397,13 +393,7 @@ void MultimodeDesigner<N>::setParams(
                         --nb;
                         T wp = w * std::real(_poles[0].p);
                         biquads.setParams(
-                              0,
-                              a0,
-                              a1,
-                              a2,
-                              (T) 1.0 + wp + w02,
-                              (T) - 2.0 + (w02 + w02),
-                              (T) 1.0 - wp + w02
+                            0, a0, a1, a2, (T) 1.0 + wp + w02, (T) - 2.0 + (w02 + w02), (T) 1.0 - wp + w02
                         );
                     }
                     for (int i = 0; i < nb; i += 2) {
@@ -454,13 +444,7 @@ void MultimodeDesigner<N>::setParams(
                         T rp = std::real(_poles[0].p);
                         T rpw02 = rp * w02;
                         biquads.setParams(
-                              0,
-                              a0,
-                              a1,
-                              a2,
-                              rp + w + rpw02,
-                              (T) - 2.0 * rp + (rpw02 + rpw02),
-                              rp - w + rpw02
+                            0, a0, a1, a2, rp + w + rpw02, (T) - 2.0 * rp + (rpw02 + rpw02), rp - w + rpw02
                         );
                     }
                     for (int i = 0; i < nb; i += 2) {
@@ -518,26 +502,10 @@ struct MultimodeDesigner<16>;
 
 template<int N>
 void MultimodeBase<N>::setParams(
-      float sampleRate,
-      Type type,
-      int poles,
-      Mode mode,
-      float frequency,
-      float qbw,
-      BandwidthMode bwm,
-      DelayMode dm
+    float sampleRate, Type type, int poles, Mode mode, float frequency, float qbw, BandwidthMode bwm, DelayMode dm
 ) {
     _designer.setParams(
-          _biquads,
-          _outGain,
-          sampleRate,
-          type,
-          poles,
-          mode,
-          frequency,
-          qbw,
-          bwm,
-          dm
+        _biquads, _outGain, sampleRate, type, poles, mode, frequency, qbw, bwm, dm
     );
 }
 

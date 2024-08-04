@@ -76,29 +76,19 @@ struct MultimodeTypes {
     typedef std::complex<T> TC;
 
     enum Type {
-        UNKNOWN_TYPE,
-        BUTTERWORTH_TYPE,
-        CHEBYSHEV_TYPE
+        UNKNOWN_TYPE, BUTTERWORTH_TYPE, CHEBYSHEV_TYPE
     };
 
     enum Mode {
-        UNKNOWN_MODE,
-        LOWPASS_MODE,
-        HIGHPASS_MODE,
-        BANDPASS_MODE,
-        BANDREJECT_MODE
+        UNKNOWN_MODE, LOWPASS_MODE, HIGHPASS_MODE, BANDPASS_MODE, BANDREJECT_MODE
     };
 
     enum BandwidthMode {
-        UNKNOWN_BANDWIDTH_MODE,
-        LINEAR_BANDWIDTH_MODE,
-        PITCH_BANDWIDTH_MODE
+        UNKNOWN_BANDWIDTH_MODE, LINEAR_BANDWIDTH_MODE, PITCH_BANDWIDTH_MODE
     };
 
     enum DelayMode {
-        UNKNOWN_DELAY_MODE,
-        FIXED_DELAY_MODE,
-        MINIMUM_DELAY_MODE
+        UNKNOWN_DELAY_MODE, FIXED_DELAY_MODE, MINIMUM_DELAY_MODE
     };
 
     static constexpr int minPoles = 1;
@@ -131,7 +121,8 @@ struct MultimodeDesigner : MultimodeTypes {
         Pole() {}
 
 
-        Pole(T re, T im, T x, T y) : p(TC(re, im)), x(x), y(y) {
+        Pole(T re, T im, T x, T y) :
+            p(TC(re, im)), x(x), y(y) {
             pc = std::conj(p);
             p2 = p * p;
             i2p = (T) 1.0 / ((T) 2.0 * p);
@@ -158,30 +149,15 @@ struct MultimodeDesigner : MultimodeTypes {
 
 
     void setParams(
-          BiquadBank<T, N> &biquads,
-          float &outGain,
-          float sampleRate,
-          Type type,
-          int poles,
-          Mode mode,
-          float frequency,
-          float qbw,
-          BandwidthMode bwm = PITCH_BANDWIDTH_MODE,
-          DelayMode dm = FIXED_DELAY_MODE
+        BiquadBank<T, N> &biquads, float &outGain, float sampleRate, Type type, int poles, Mode mode, float frequency, float qbw, BandwidthMode bwm = PITCH_BANDWIDTH_MODE
+        , DelayMode dm = FIXED_DELAY_MODE
     );
 };
 
 
 struct MultimodeFilter : MultimodeTypes, ResetableFilter {
     virtual void setParams(
-          float sampleRate,
-          Type type,
-          int poles,
-          Mode mode,
-          float frequency,
-          float qbw,
-          BandwidthMode bwm = PITCH_BANDWIDTH_MODE,
-          DelayMode dm = FIXED_DELAY_MODE
+        float sampleRate, Type type, int poles, Mode mode, float frequency, float qbw, BandwidthMode bwm = PITCH_BANDWIDTH_MODE, DelayMode dm = FIXED_DELAY_MODE
     ) = 0;
 };
 
@@ -197,14 +173,7 @@ struct MultimodeBase : MultimodeFilter {
 
 
     void setParams(
-          float sampleRate,
-          Type type,
-          int poles,
-          Mode mode,
-          float frequency,
-          float qbw,
-          BandwidthMode bwm = PITCH_BANDWIDTH_MODE,
-          DelayMode dm = FIXED_DELAY_MODE
+        float sampleRate, Type type, int poles, Mode mode, float frequency, float qbw, BandwidthMode bwm = PITCH_BANDWIDTH_MODE, DelayMode dm = FIXED_DELAY_MODE
     ) override;
 
 
@@ -225,17 +194,10 @@ struct FourPoleButtworthLowpassFilter {
 
 
     inline void setParams(
-          float sampleRate,
-          float frequency,
-          float q
+        float sampleRate, float frequency, float q
     ) {
         _filter.setParams(
-              sampleRate,
-              MultimodeFilter::BUTTERWORTH_TYPE,
-              4,
-              MultimodeFilter::LOWPASS_MODE,
-              frequency,
-              q
+            sampleRate, MultimodeFilter::BUTTERWORTH_TYPE, 4, MultimodeFilter::LOWPASS_MODE, frequency, q
         );
     }
 
@@ -252,17 +214,10 @@ struct FourPoleButtworthHighpassFilter {
 
 
     inline void setParams(
-          float sampleRate,
-          float frequency,
-          float q
+        float sampleRate, float frequency, float q
     ) {
         _filter.setParams(
-              sampleRate,
-              MultimodeFilter::BUTTERWORTH_TYPE,
-              4,
-              MultimodeFilter::HIGHPASS_MODE,
-              frequency,
-              q
+            sampleRate, MultimodeFilter::BUTTERWORTH_TYPE, 4, MultimodeFilter::HIGHPASS_MODE, frequency, q
         );
     }
 
@@ -279,19 +234,10 @@ struct TwoPoleButtworthBandpassFilter {
 
 
     inline void setParams(
-          float sampleRate,
-          float frequency,
-          float bw,
-          MultimodeFilter::BandwidthMode bwm = MultimodeFilter::PITCH_BANDWIDTH_MODE
+        float sampleRate, float frequency, float bw, MultimodeFilter::BandwidthMode bwm = MultimodeFilter::PITCH_BANDWIDTH_MODE
     ) {
         _filter.setParams(
-              sampleRate,
-              MultimodeFilter::BUTTERWORTH_TYPE,
-              2,
-              MultimodeFilter::BANDPASS_MODE,
-              frequency,
-              bw,
-              bwm
+            sampleRate, MultimodeFilter::BUTTERWORTH_TYPE, 2, MultimodeFilter::BANDPASS_MODE, frequency, bw, bwm
         );
     }
 
@@ -308,19 +254,10 @@ struct FourPoleButtworthBandpassFilter {
 
 
     inline void setParams(
-          float sampleRate,
-          float frequency,
-          float bw,
-          MultimodeFilter::BandwidthMode bwm = MultimodeFilter::PITCH_BANDWIDTH_MODE
+        float sampleRate, float frequency, float bw, MultimodeFilter::BandwidthMode bwm = MultimodeFilter::PITCH_BANDWIDTH_MODE
     ) {
         _filter.setParams(
-              sampleRate,
-              MultimodeFilter::BUTTERWORTH_TYPE,
-              4,
-              MultimodeFilter::BANDPASS_MODE,
-              frequency,
-              bw,
-              bwm
+            sampleRate, MultimodeFilter::BUTTERWORTH_TYPE, 4, MultimodeFilter::BANDPASS_MODE, frequency, bw, bwm
         );
     }
 

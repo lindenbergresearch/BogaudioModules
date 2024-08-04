@@ -1,7 +1,7 @@
 #pragma once
 
-#include "assert.h"
-#include "math.h"
+#include <cassert>
+#include <cmath>
 #include <algorithm>
 
 namespace bogaudio {
@@ -18,8 +18,8 @@ struct OverlappingBuffer {
     int _sample;
 
 
-    OverlappingBuffer(int size, int o, bool autoProcess = true)
-          : _size(size), _overlap(o), _autoProcess(autoProcess), _overlapN(_size / _overlap), _samplesN(2 * _size - _overlapN), _samples(new T[_samplesN]), _sample(0) {
+    OverlappingBuffer(int size, int o, bool autoProcess = true) :
+        _size(size), _overlap(o), _autoProcess(autoProcess), _overlapN(_size / _overlap), _samplesN(2 * _size - _overlapN), _samples(new T[_samplesN]), _sample(0) {
         assert(_size > 0);
         assert(_overlap > 0 && _overlap <= _size && _size % _overlap == 0);
     }
@@ -76,11 +76,10 @@ struct AveragingBuffer {
 
 
     AveragingBuffer(
-          int size,
-          int framesToAverage
-    )
-          : _size(size), _framesN(framesToAverage), _inverseFramesN(1.0 / (float) _framesN), _sums(new T[_size]{}), _averages(new T[_size]{}), _frames(new T[_size * _framesN]{}), _currentFrame(0),
-            _resetsPerCommit(std::max(_size / 100, 10)), _currentReset(0) {
+        int size, int framesToAverage
+    ) :
+        _size(size), _framesN(framesToAverage), _inverseFramesN(1.0 / (float) _framesN), _sums(new T[_size]{}), _averages(new T[_size]{}), _frames(new T[_size * _framesN]{})
+        , _currentFrame(0), _resetsPerCommit(std::max(_size / 100, 10)), _currentReset(0) {
         assert(framesToAverage > 0);
     }
 
@@ -133,8 +132,8 @@ struct HistoryBuffer {
     T *_buf;
 
 
-    HistoryBuffer(int size, T initialValue)
-          : _size(size), _i(0) {
+    HistoryBuffer(int size, T initialValue) :
+        _size(size), _i(0) {
         assert(size > 0);
         _buf = new T[size];
         std::fill(_buf, _buf + size, initialValue);

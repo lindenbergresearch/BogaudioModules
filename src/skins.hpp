@@ -18,12 +18,13 @@ struct Skin {
     std::string display;
 
 
-    Skin(const char *key, const char *display) : key(key), display(display) {}
+    Skin(const char *key, const char *display) :
+        key(key), display(display) {}
 };
 
 
 class Skins {
-private:
+  private:
     typedef std::unordered_map<std::string, std::string> css_values_map;
     typedef std::unordered_map<std::string, css_values_map> skin_css_values_map;
     typedef std::unordered_set<DefaultSkinChangeListener *> default_skin_listeners_set;
@@ -35,7 +36,7 @@ private:
     bool _loaded = false;
     std::mutex _instanceLock;
 
-public:
+  public:
     Skins() {}
 
 
@@ -72,7 +73,7 @@ public:
     void deregisterDefaultSkinChangeListener(DefaultSkinChangeListener *listener);
 
 
-private:
+  private:
     void loadSkins();
 
 
